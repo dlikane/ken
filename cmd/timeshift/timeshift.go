@@ -134,12 +134,19 @@ func processCards(timeCards *TimeCards) error {
 	for i, tc := range timeCards.TimeCards {
 		for j, shift := range tc.Shift {
 			arr := make([]ShiftHours, 0)
+			// currentDay := time.Time{}
 			for _, sh := range shift.ShiftHours {
+				// if ndx == 0 {
+				// 	currentDay = time.Now()
+				// }
 				if sh.Break != nil && *sh.Break != "00:00" {
 					start := time.Time(sh.StartTime)
 					finish := time.Time(sh.FinishTime)
 					shiftDuration := finish.Sub(start)
 					hs, err := strconv.ParseUint((*sh.Break)[:2], 10, 32)
+					if err != nil {
+						return fmt.Errorf("can't parse Break: %s", *sh.Break)
+					}
 					mi, err := strconv.ParseUint((*sh.Break)[3:], 10, 32)
 					if err != nil {
 						return fmt.Errorf("can't parse Break: %s", *sh.Break)
@@ -160,6 +167,9 @@ func processCards(timeCards *TimeCards) error {
 					}
 					arr = append(arr, sh1)
 					arr = append(arr, sh2)
+
+
+
 				} else {
 					sh.Break = nil
 					arr = append(arr, sh)
