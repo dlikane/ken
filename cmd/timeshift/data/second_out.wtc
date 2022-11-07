@@ -124,12 +124,16 @@
 			</ShiftHours>
 		</Shift>
 		<Allowance Type="Unit">
-			<AllowanceNo>Second Broken</AllowanceNo>
-			<Value>1</Value>
+			<AllowanceNo>First Broken</AllowanceNo>
+			<Value>0.5</Value>
 		</Allowance>
 		<Allowance Type="Unit">
-			<AllowanceNo>First Broken</AllowanceNo>
-			<Value>2</Value>
+			<AllowanceNo>Second Broken</AllowanceNo>
+			<Value>2.5</Value>
+		</Allowance>
+		<Allowance Type="Unit">
+			<AllowanceNo>Second Broken</AllowanceNo>
+			<Value>0.25</Value>
 		</Allowance>
 		<TotalHours>30.5</TotalHours>
 	</TimeCard>

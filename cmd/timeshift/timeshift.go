@@ -59,12 +59,12 @@ type Allowance struct {
 }
 
 type TimeCard struct {
-	XMLName      xml.Name   `xml:"TimeCard"`
-	TimeCardNo   string     `xml:"TimeCardNo"`
-	EmployeeName string     `xml:"EmployeeName"`
-	Shift        []Shift    `xml:"Shift"`
-	Allowance    *Allowance `xml:"Allowance,omitempty"`
-	TotalHours   float32    `xml:"TotalHours"`
+	XMLName      xml.Name    `xml:"TimeCard"`
+	TimeCardNo   string      `xml:"TimeCardNo"`
+	EmployeeName string      `xml:"EmployeeName"`
+	Shift        []Shift     `xml:"Shift"`
+	Allowance    []Allowance `xml:"Allowance,omitempty"`
+	TotalHours   float32     `xml:"TotalHours"`
 }
 
 type TimeCards struct {
@@ -210,8 +210,9 @@ func processCards(timeCards *TimeCards) error {
 
 func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 	csvShifts := make([]CsvShift, 0)
-	for _, tc := range timeCards.TimeCards {
-		allowances := 0
+	for i, tc := range timeCards.TimeCards {
+		allowances := make([]Allowance, 0)
+		cntAllowances := 0
 		continuesShift := float64(0)
 		shiftNdx := 0
 		var previousShift *ShiftHours
@@ -224,7 +225,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				}
 
 				if shiftNdx == 0 {
-					allowances = 0
+					cntAllowances = 0
 					continuesShift = 0
 					previousShift = nil
 					isOvernight = time.Time(sh.StartTime) == truncateToDay(sh.StartTime)
@@ -247,12 +248,23 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				// ignore overnight shift (starts at 0:00)
 				if !isOvernight {
 					if breakDuration > 1 || breakDuration > 0 && continuesShift > 5 {
-						if allowances == 0 {
+						if cntAllowances == 0 {
 							strAllowance = "First"
-						} else if allowances == 1 {
+							allowances = append(allowances, Allowance{
+								Type:        "Unit",
+								AllowanceNo: "First Broken",
+								Value:       float32(breakDuration),
+							})
+						} else if cntAllowances == 1 {
 							strAllowance = "Second"
+							allowances = allowances[:len(allowances)-1]
+							allowances = append(allowances, Allowance{
+								Type:        "Unit",
+								AllowanceNo: "Second Broken",
+								Value:       float32(breakDuration),
+							})
 						}
-						allowances++
+						cntAllowances++
 					}
 				}
 
@@ -268,6 +280,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				previousShift = &sh
 			}
 		}
+		timeCards.TimeCards[i].Allowance = append(timeCards.TimeCards[i].Allowance, allowances...)
 	}
 	return csvShifts, nil
 }
