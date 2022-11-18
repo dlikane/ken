@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "cmd/timeshift",
-            "args": ["./data/Cook_Timesheet_Export_31-10_to_13-11_at_03-11-22.wtc"]
+            "args": ["./data/test.wtc"]
         }
     ]
 }

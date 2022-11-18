@@ -79,6 +79,8 @@ type CsvShift struct {
 	Shift     string  `csv:"Shift"`
 	Break     float64 `csv:"Break"`
 	Allowance string  `csv:"Allowance"`
+	ActualFirst float64  `csv:"ActualFirst"`
+	ActualSecond float64  `csv:"ActualSecond"`
 }
 
 func main() {
@@ -92,7 +94,7 @@ func main() {
 	fileName := os.Args[1]
 	ext := filepath.Ext(fileName)
 	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
-	csvFileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ",csv"
+	csvFileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ".csv"
 
 	timeCards, err := readCards(fileName)
 	if err != nil {
@@ -191,12 +193,6 @@ func processCards(timeCards *TimeCards) error {
 				}
 			}
 			timeCards.TimeCards[i].Shift[j].ShiftHours = arr
-
-			sort.Slice(shift.ShiftHours, func(i1 int, i2 int) bool {
-				s1 := shift.ShiftHours[i1]
-				s2 := shift.ShiftHours[i2]
-				return time.Time(s1.StartTime).Before(time.Time(s2.StartTime))
-			})
 		}
 		sort.Slice(tc.Shift, func(i1 int, i2 int) bool {
 			s1 := tc.Shift[i1].ShiftHours[0]
@@ -218,7 +214,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		var previousShift *ShiftHours
 		isOvernight := false
 		for _, shift := range tc.Shift {
-			for _, sh := range shift.ShiftHours {
+			for j, sh := range shift.ShiftHours {
 				// is new day
 				if previousShift != nil && truncateToDay(sh.StartTime) != truncateToDay(previousShift.StartTime) {
 					shiftNdx = 0
@@ -228,16 +224,26 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					cntAllowances = 0
 					continuesShift = 0
 					previousShift = nil
-					isOvernight = time.Time(sh.StartTime) == truncateToDay(sh.StartTime)
 				}
+				isOvernight = truncateToDay(sh.StartTime) != truncateToDay(sh.FinishTime)
+
 				start := time.Time(sh.StartTime)
 				finish := time.Time(sh.FinishTime)
 				shiftDuration := finish.Sub(start).Hours()
-				continuesShift += shiftDuration
 
 				breakDuration := float64(0)
 				if previousShift != nil {
 					breakDuration = time.Time(sh.StartTime).Sub(time.Time(previousShift.FinishTime)).Hours()
+					if breakDuration < 0 {
+						msg := fmt.Sprintf(
+							"prev: StartTime: %s FinishTime: %s sh: StartTime: %s FinishTime: %s", 
+							time.Time(previousShift.StartTime).Format("2006-01-02 15:04"),
+							time.Time(previousShift.FinishTime).Format("2006-01-02 15:04"),
+							time.Time(sh.StartTime).Format("2006-01-02 15:04"), 
+							time.Time(sh.FinishTime).Format("2006-01-02 15:04"), 
+						)
+						log.Println(msg)
+					}
 				}
 
 				if shiftNdx == 0 {
@@ -245,6 +251,8 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				}
 
 				strAllowance := ""
+				actualFirst := float64(0)
+				actualSecond := float64(0)
 				// ignore overnight shift (starts at 0:00)
 				if !isOvernight {
 					if breakDuration > 1 || breakDuration > 0 && continuesShift > 5 {
@@ -255,6 +263,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 								AllowanceNo: "First Broken",
 								Value:       float32(breakDuration),
 							})
+							actualFirst = float64(breakDuration)
 						} else if cntAllowances == 1 {
 							strAllowance = "Second"
 							allowances = allowances[:len(allowances)-1]
@@ -263,6 +272,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 								AllowanceNo: "Second Broken",
 								Value:       float32(breakDuration),
 							})
+							actualSecond = float64(breakDuration)
 						}
 						cntAllowances++
 					}
@@ -274,10 +284,13 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					Shift:     printStartFinish(sh),
 					Break:     breakDuration,
 					Allowance: strAllowance,
+					ActualFirst: actualFirst,
+					ActualSecond: actualSecond,
 				})
 
 				shiftNdx++
-				previousShift = &sh
+				continuesShift += shiftDuration
+				previousShift = &shift.ShiftHours[j]
 			}
 		}
 		timeCards.TimeCards[i].Allowance = append(timeCards.TimeCards[i].Allowance, allowances...)
@@ -291,7 +304,7 @@ func truncateToDay(x xmlTime) time.Time {
 }
 
 func printDate(x xmlTime) string {
-	return time.Time(x).Format("2006-02-01")
+	return time.Time(x).Format("2006-01-02")
 }
 func printStartFinish(sh ShiftHours) string {
 	return time.Time(sh.StartTime).Format("15:04") + " - " + time.Time(sh.FinishTime).Format("15:04")

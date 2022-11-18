@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TimeCards Version="2.3">
+	<TimeCard>
+		<TimeCardNo>TAPBA</TimeCardNo>
+		<EmployeeName>Barnhart Tapanga</EmployeeName>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2022-11-04T09:00:00</StartTime>
+				<FinishTime>2022-11-04T12:00:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2022-11-04T12:30:00</StartTime>
+				<FinishTime>2022-11-04T18:15:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<TotalHours>70.75</TotalHours>
+	</TimeCard>
+</TimeCards>
