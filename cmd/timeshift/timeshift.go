@@ -101,14 +101,14 @@ func main() {
 		log.Fatal(fmt.Sprintf("Can't parse file: %s: %v", fileName, err))
 	}
 
-	err = processCards(timeCards)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("process cards: %v", err))
-	}
-
 	csvShifts, err := processAllowances(timeCards)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("process allowances: %v", err))
+	}
+
+	err = processCards(timeCards)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
 
 	err = writeCsvShifts(csvShifts, csvFileNameOut)
@@ -210,6 +210,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		allowances := make([]Allowance, 0)
 		cntAllowances := 0
 		continuesShift := float64(0)
+		cntBreaks := 0
 		shiftNdx := 0
 		var previousShift *ShiftHours
 		isOvernight := false
@@ -224,8 +225,11 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					cntAllowances = 0
 					continuesShift = 0
 					previousShift = nil
+					cntBreaks = 0
 				}
-				isOvernight = truncateToDay(sh.StartTime) != truncateToDay(sh.FinishTime)
+				// instead of isOvernight check that it is not started at midnight:
+				//     isOvernight = truncateToDay(sh.StartTime) != truncateToDay(sh.FinishTime)
+				isOvernight = truncateToDay(sh.StartTime) == time.Time(sh.StartTime)
 
 				start := time.Time(sh.StartTime)
 				finish := time.Time(sh.FinishTime)
@@ -255,25 +259,29 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				actualSecond := float64(0)
 				// ignore overnight shift (starts at 0:00)
 				if !isOvernight {
-					if breakDuration > 1 || breakDuration > 0 && continuesShift > 5 {
-						if cntAllowances == 0 {
-							strAllowance = "First"
-							allowances = append(allowances, Allowance{
-								Type:        "Unit",
-								AllowanceNo: "First Broken",
-								Value:       float32(breakDuration),
-							})
-							actualFirst = float64(breakDuration)
-						} else if cntAllowances == 1 {
-							strAllowance = "Second"
-							allowances = allowances[:len(allowances)-1]
-							allowances = append(allowances, Allowance{
-								Type:        "Unit",
-								AllowanceNo: "Second Broken",
-								Value:       float32(breakDuration),
-							})
-							actualSecond = float64(breakDuration)
-						}
+					if breakDuration > 0 {
+						cntBreaks++
+					}
+					if cntAllowances == 0 && 
+						((breakDuration > 1 || (breakDuration > 0 && (continuesShift > 5 || shiftDuration > 5))) || 
+						(breakDuration > 0 && cntBreaks > 1)) {
+						strAllowance = "First"
+						allowances = append(allowances, Allowance{
+							Type:        "Unit",
+							AllowanceNo: "First Broken",
+							Value:       float32(breakDuration),
+						})
+						actualFirst = float64(breakDuration)
+						cntAllowances++
+					} else if cntAllowances == 1 && breakDuration > 0 {
+						strAllowance = "Second"
+						allowances = allowances[:len(allowances)-1]
+						allowances = append(allowances, Allowance{
+							Type:        "Unit",
+							AllowanceNo: "Second Broken",
+							Value:       float32(breakDuration),
+						})
+						actualSecond = float64(breakDuration)
 						cntAllowances++
 					}
 				}
@@ -293,7 +301,30 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				previousShift = &shift.ShiftHours[j]
 			}
 		}
-		timeCards.TimeCards[i].Allowance = append(timeCards.TimeCards[i].Allowance, allowances...)
+		totalFirstCnt := 0
+		totalSecondCnt := 0
+		for _, a := range allowances {
+			if a.AllowanceNo == "First Broken" {
+				totalFirstCnt++
+			} 
+			if a.AllowanceNo == "Second Broken" {
+				totalSecondCnt++
+			} 
+		}
+		if totalFirstCnt > 0 {
+			timeCards.TimeCards[i].Allowance = append(timeCards.TimeCards[i].Allowance, Allowance{
+				Type:        "Unit",
+				AllowanceNo: "First Broken",
+				Value:       float32(totalFirstCnt),
+			})
+		}
+		if totalSecondCnt > 0 {
+			timeCards.TimeCards[i].Allowance = append(timeCards.TimeCards[i].Allowance, Allowance{
+				Type:        "Unit",
+				AllowanceNo: "Second Broken",
+				Value:       float32(totalSecondCnt),
+			})
+		}
 	}
 	return csvShifts, nil
 }
