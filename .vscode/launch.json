@@ -5,12 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Package",
+            "name": "Timeshift run test",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "cmd/timeshift",
             "args": ["./data/test.wtc"]
+        },
+        {
+            "name": "Invoicedates run october",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/invoicedates",
+            "args": ["./data/october.txt"]
         }
     ]
 }

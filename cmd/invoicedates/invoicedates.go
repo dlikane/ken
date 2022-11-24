@@ -57,6 +57,8 @@ func main() {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
 
+	err = sumupIvoices(invoices)
+
 	err = writeInvoices(invoices, fileNameOut)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))

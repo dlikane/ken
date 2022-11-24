@@ -1,0 +1,26 @@
+{}
+Client First Name,Client Last Name,Card ID,Job,Account N,Tax Code,Description,Date,Total,Price,Item Number,Quantity,Category,CustomerPO n.,Salesperson Name,Referral Source,Service Date From,Service Date To,Journal Memo,Comments,Invoice Reference
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,19,,FRE,04_104_0125_6_1_T - Access Community Social and Rec Activ - Standard - Weekday Daytime - TTP 3/10/2022 - 31/10/2022,31/10/2022,1601,64.04,04_104_0125_6_1_T,25,,,,,2022-10-03,2022-10-31,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,19,,FRE,04_590_0125_6_1 - Activity Based Transport (Transport) 1/10/2022 - 31/10/2022,31/10/2022,395,1,04_590_0125_6_1,395,,,,,2022-10-01,2022-10-31,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,19,,FRE,04_105_0125_6_1_T - Access Community Social and Rec Activ - Standard - Saturday - TTP 8/10/2022 - 8/10/2022,31/10/2022,811.26,90.14,04_105_0125_6_1_T,9,,,,,2022-10-08,2022-10-08,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,INHOME,,FRE,04_590_0125_6_1 - Activity Based Transport (Transport) 1/10/2022 - 31/10/2022,31/10/2022,52,1,04_590_0125_6_1,52,,,,,2022-10-01,2022-10-31,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,INHOME,,FRE,04_104_0125_6_1_T - Access Community Social and Rec Activ - Standard - Weekday Daytime - TTP 11/10/2022 - 11/10/2022,31/10/2022,128.08,64.04,04_104_0125_6_1_T,2,,,,,2022-10-11,2022-10-11,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,19,,FRE,04_105_0125_6_1_T - Access Community Social and Rec Activ - Standard - Saturday - TTP (Cancelled) 22/10/2022 - 22/10/2022,31/10/2022,630.98,90.14,04_105_0125_6_1_T,7,,,,,2022-10-22,2022-10-22,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,05,,FRE,04_590_0125_6_1 - Activity Based Transport (Transport) 1/10/2022 - 31/10/2022,31/10/2022,7,1,04_590_0125_6_1,7,,,,,2022-10-01,2022-10-31,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,05,,FRE,04_104_0125_6_1_T - Access Community Social and Rec Activ - Standard - Weekday Daytime - TTP 27/10/2022 - 27/10/2022,31/10/2022,224.14,64.04,04_104_0125_6_1_T,3.5,,,,,2022-10-27,2022-10-27,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,05,,FRE,04_599_0136_6_1 - Centre Capital Cost 27/10/2022 - 27/10/2022,31/10/2022,6.84,2.28,04_599_0136_6_1,3,,,,,2022-10-27,2022-10-27,,,20220930
+Allan Clissold C/O CoConnect PM,,AC71842SUPP,05,,FRE,04_210_0125_6_1 - Participant NDIS Activity Fee CORE Social 27/10/2022 - 27/10/2022,31/10/2022,7,1,04_210_0125_6_1,7,,,,,2022-10-27,2022-10-27,,,20220930
+,,,,,,,,,,,,,,,,,,,,
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,INHOME,,FRE,04_402_0104_1_1_T - Access Community Social and Rec Activ - High Intensity - Saturday - TTP 1/10/2022 - 29/10/2022,31/10/2022,1168.08,97.34,04_402_0104_1_1_T,12,,,,,2022-10-01,2022-10-29,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,INHOME,,FRE,02_051_0108_1_1 - Transport (Transport) 1/10/2022 - 31/10/2022,31/10/2022,352.5,1,02_051_0108_1_1,352.5,,,,,2022-10-01,2022-10-31,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,13,,FRE,04_600_0104_6_1_T - Group Activities - High Intensity - Weekday Daytime - TTP 3/10/2022 - 27/10/2022,31/10/2022,1971.06,34.58,04_600_0104_6_1_T,57,,,,,2022-10-03,2022-10-27,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,13,,FRE,04_599_0104_6_1 - Centre Capital Cost 3/10/2022 - 28/10/2022,31/10/2022,212.04,2.28,04_599_0104_6_1,93,,,,,2022-10-03,2022-10-28,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,13,,FRE,04_600_0104_6_1_T - Group Activities - High Intensity - Weekday Daytime - TTP 3/10/2022 - 28/10/2022,31/10/2022,553.2,69.15,04_600_0104_6_1_T,8,,,,,2022-10-03,2022-10-28,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,13,,FRE,04_600_0104_6_1_T - Group Activities - High Intensity - Weekday Daytime - TTP 3/10/2022 - 28/10/2022,31/10/2022,829.8,23.05,04_600_0104_6_1_T,36,,,,,2022-10-03,2022-10-28,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,INHOME,,FRE,04_400_0104_1_1_T - Access Community Social and Rec Activ - High Intensity - Weekday Daytime - TTP 3/10/2022 - 31/10/2022,31/10/2022,1348.43,69.15,04_400_0104_1_1_T,19.5,,,,,2022-10-03,2022-10-31,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,05,,FRE,04_401_0104_1_1_T - Access Community Social and Rec Activ - High Intensity - Weekday Evening - TTP 3/10/2022 - 3/10/2022,31/10/2022,76.2,38.1,04_401_0104_1_1_T,2,,,,,2022-10-03,2022-10-03,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,05,,FRE,04_600_0104_6_1_T - Group Activities - High Intensity - Weekday Daytime - TTP 5/10/2022 - 26/10/2022,31/10/2022,1797.9,69.15,04_600_0104_6_1_T,26,,,,,2022-10-05,2022-10-26,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,05,,FRE,04_599_0104_6_1 - Centre Capital Cost 5/10/2022 - 26/10/2022,31/10/2022,54.72,2.28,04_599_0104_6_1,24,,,,,2022-10-05,2022-10-26,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,05,,FRE,04_402_0104_1_1_T - Access Community Social and Rec Activ - High Intensity - Saturday - TTP 22/10/2022 - 22/10/2022,31/10/2022,219.02,48.67,04_402_0104_1_1_T,4.5,,,,,2022-10-22,2022-10-22,,,20220930
+Douglas Farquhar C/O Co-Connect,,DF41147SUPTRASC,05,,FRE,02_051_0108_1_1 - Transport (Transport) 1/10/2022 - 31/10/2022,31/10/2022,6,1,02_051_0108_1_1,6,,,,,2022-10-01,2022-10-31,,,20220930
+,,,,,,,,,,,,,,,,,,,,
