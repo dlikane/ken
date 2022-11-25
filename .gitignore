@@ -3,3 +3,4 @@ web
 data/*
 
 *.exe
+.env

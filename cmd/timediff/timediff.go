@@ -16,7 +16,7 @@ import (
 var server = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
 var port = 6033
 var user = "skillsconn_bi"
-var password = "mbq.HPH2uvp4adu.dnk"
+var password = "****"
 var dbname = "flg_skillsconn"
 
 var baseQuery = `SELECT 

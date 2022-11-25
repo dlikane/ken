@@ -3,7 +3,7 @@
 Host: auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com
 Port: 6033
 Username: skillsconn_bi
-Password: mbq.HPH2uvp4adu.dnk
+Password: see in .env
 
 I’ve developed the attached sql to identify where worked (timesheet) hours <> Billed hours.  Output sample below.
 The first Almira actually matches because her single timesheet (clock on/off) covers two shifts 2.5 + 3 = 5.5 timesheet hours.

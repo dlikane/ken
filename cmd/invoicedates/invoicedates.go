@@ -7,33 +7,37 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/jszwec/csvutil"
 )
 
 type Invoice struct {
-	FirstName       string `csv:"Client First Name"`
-	LastName        string `csv:"Client Last Name"`
-	CardID          string `csv:"Card ID"`
-	Job             string `csv:"Job"`
-	Account         string `csv:"Account N"`
-	TaxCode         string `csv:"Tax Code"`
-	Description     string `csv:"Description"`
-	Date            string `csv:"Date"`
-	Total           string `csv:"Total"`
-	Price           string `csv:"Price"`
-	ItemNumber      string `csv:"Item Number"`
-	Quantity        string `csv:"Quantity"`
-	Category        string `csv:"Category"`
-	CustomerPO      string `csv:"CustomerPO n."`
-	SalesPerson     string `csv:"Salesperson Name"`
-	Refferal        string `csv:"Referral Source"`
-	ServiceDateFrom string `csv:"Service Date From"`
-	ServiceDateTo   string `csv:"Service Date To"`
-	Memo            string `csv:"Journal Memo"`
-	Comments        string `csv:"Comments"`
-	Reference       string `csv:"Invoice Reference"`
+	FirstName       string  `csv:"Client First Name"`
+	LastName        string  `csv:"Client Last Name"`
+	CardID          string  `csv:"Card ID"`
+	Job             string  `csv:"Job"`
+	Account         string  `csv:"Account N"`
+	TaxCode         string  `csv:"Tax Code"`
+	Description     string  `csv:"Description"`
+	Date            string  `csv:"Date"`
+	Total           string  `csv:"Total"`
+	Price           string  `csv:"Price"`
+	ItemNumber      string  `csv:"Item Number"`
+	Quantity        string  `csv:"Quantity"`
+	Category        string  `csv:"Category"`
+	CustomerPO      string  `csv:"CustomerPO n."`
+	SalesPerson     string  `csv:"Salesperson Name"`
+	Refferal        string  `csv:"Referral Source"`
+	ServiceDateFrom string  `csv:"Service Date From"`
+	ServiceDateTo   string  `csv:"Service Date To"`
+	Memo            string  `csv:"Journal Memo"`
+	Comments        string  `csv:"Comments"`
+	Reference       string  `csv:"Invoice Reference"`
+	Tot             float32 `csv:"-"`
+	Qty             float32 `csv:"-"`
+	MaxQty          float32 `csv:"-"`
 }
 
 func main() {
@@ -57,7 +61,10 @@ func main() {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
 
-	err = sumupIvoices(invoices)
+	invoices, err = sumUpInvoices(invoices)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Can't summup invoices: %v", err))
+	}
 
 	err = writeInvoices(invoices, fileNameOut)
 	if err != nil {
@@ -119,11 +126,48 @@ func processInvoices(invoices []Invoice) error {
 				invoices[i].ServiceDateTo = toLastOfMonth.Format("2006-01-02")
 			}
 			invoices[i].Description += " " + reformatDate(invoices[i].ServiceDateFrom) + " - " + reformatDate(invoices[i].ServiceDateTo)
+			qty, err := strconv.ParseFloat(inv.Quantity, 32)
+			if err == nil {
+				invoices[i].Qty = float32(qty)
+			}
+			tot, err := strconv.ParseFloat(inv.Total, 32)
+			if err == nil {
+				invoices[i].Tot = float32(tot)
+			}
 			cnt++
 		}
 	}
 	log.Printf("number of lines: %d invoices: %d", len(invoices), cnt)
 	return nil
+}
+
+func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
+	clientInvoices := make(map[string]*Invoice, 1)
+	for _, inv := range invoices {
+		if inv.CardID == "" {
+			continue
+		}
+		if _, ok := clientInvoices[inv.CardID]; ok {
+			clientInvoices[inv.CardID].Qty += inv.Qty
+			clientInvoices[inv.CardID].Tot += inv.Tot
+			if clientInvoices[inv.CardID].MaxQty < inv.Qty {
+				clientInvoices[inv.CardID].MaxQty = inv.Qty
+				clientInvoices[inv.CardID].Job = inv.Job
+			}
+		} else {
+			rec := inv
+			clientInvoices[inv.CardID] = &rec
+			clientInvoices[inv.CardID].MaxQty = rec.Qty
+		}
+	}
+
+	ret := make([]Invoice, 0)
+	for _, inv := range clientInvoices {
+		inv.Quantity = fmt.Sprintf("%.2f", inv.Qty)
+		inv.Total = fmt.Sprintf("%.2f", inv.Tot)
+		ret = append(ret, *inv)
+	}
+	return ret, nil
 }
 
 func writeInvoices(invoices []Invoice, filename string) error {
