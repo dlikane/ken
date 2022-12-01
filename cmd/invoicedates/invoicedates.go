@@ -15,9 +15,9 @@ import (
 )
 
 type Invoice struct {
-	Ord				int     `csv:"Ord"`
-	Cnt             int     `csv:"Cnt"`
-	Recs            string  `csv:"Recs"`
+	Ord             int     `csv:"_"`
+	Cnt             int     `csv:"_"`
+	Recs            string  `csv:"_"`
 	FirstName       string  `csv:"Client First Name"`
 	LastName        string  `csv:"Client Last Name"`
 	CardID          string  `csv:"Card ID"`
@@ -158,15 +158,18 @@ func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 	ord := 0
 	for _, inv := range invoices {
 		_, isTransport := codes[inv.ItemNumber]
+		kkey := fmt.Sprintf("%d", ord)
 		if inv.CardID == "" {
 			rec := inv
-			kkey := fmt.Sprintf("%d", ord)
 			clientInvoices[kkey] = &rec
 			clientInvoices[kkey].Cnt = 1
 			ord++
 			continue
 		}
 		key := inv.CardID + ":" + inv.ServiceDateFrom + inv.ServiceDateTo
+		if !isTransport {
+			key = kkey
+		}
 		_, ok := clientInvoices[key]
 		if isTransport && ok {
 			clientInvoices[key].Qty += inv.Qty
