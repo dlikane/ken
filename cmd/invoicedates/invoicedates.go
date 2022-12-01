@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"time"
 
@@ -14,6 +15,9 @@ import (
 )
 
 type Invoice struct {
+	Ord				int     `csv:"Ord"`
+	Cnt             int     `csv:"Cnt"`
+	Recs            string  `csv:"Recs"`
 	FirstName       string  `csv:"Client First Name"`
 	LastName        string  `csv:"Client Last Name"`
 	CardID          string  `csv:"Card ID"`
@@ -50,6 +54,7 @@ func main() {
 	fileName := os.Args[1]
 	ext := filepath.Ext(fileName)
 	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
+	fileNameOutAll := fileName[:len(fileName)-len(ext)] + "_all" + ext
 
 	invoices, err := readInvoices(fileName)
 	if err != nil {
@@ -59,6 +64,11 @@ func main() {
 	err = processInvoices(invoices)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
+	}
+
+	err = writeInvoices(invoices, fileNameOutAll)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
 	}
 
 	invoices, err = sumUpInvoices(invoices)
@@ -106,6 +116,8 @@ func processInvoices(invoices []Invoice) error {
 	cnt := 0
 	for i := range invoices {
 		inv := invoices[i]
+		invoices[i].Ord = i
+		invoices[i].Recs = fmt.Sprintf("%d", i)
 		if inv.Description != "" && inv.ServiceDateFrom != "" && inv.ServiceDateTo != "" {
 			if _, ok := codes[inv.ItemNumber]; ok {
 				log.Printf("found code")
@@ -143,30 +155,48 @@ func processInvoices(invoices []Invoice) error {
 
 func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 	clientInvoices := make(map[string]*Invoice, 1)
+	ord := 0
 	for _, inv := range invoices {
+		_, isTransport := codes[inv.ItemNumber]
 		if inv.CardID == "" {
+			rec := inv
+			kkey := fmt.Sprintf("%d", ord)
+			clientInvoices[kkey] = &rec
+			clientInvoices[kkey].Cnt = 1
+			ord++
 			continue
 		}
-		if _, ok := clientInvoices[inv.CardID]; ok {
-			clientInvoices[inv.CardID].Qty += inv.Qty
-			clientInvoices[inv.CardID].Tot += inv.Tot
-			if clientInvoices[inv.CardID].MaxQty < inv.Qty {
-				clientInvoices[inv.CardID].MaxQty = inv.Qty
-				clientInvoices[inv.CardID].Job = inv.Job
+		key := inv.CardID + ":" + inv.ServiceDateFrom + inv.ServiceDateTo
+		_, ok := clientInvoices[key]
+		if isTransport && ok {
+			clientInvoices[key].Qty += inv.Qty
+			clientInvoices[key].Tot += inv.Tot
+			if clientInvoices[key].MaxQty < inv.Qty {
+				clientInvoices[key].MaxQty = inv.Qty
+				clientInvoices[key].Job = inv.Job
 			}
+			clientInvoices[key].Cnt++
+			clientInvoices[key].Recs += fmt.Sprintf(",%d", inv.Ord)
 		} else {
 			rec := inv
-			clientInvoices[inv.CardID] = &rec
-			clientInvoices[inv.CardID].MaxQty = rec.Qty
+			clientInvoices[key] = &rec
+			clientInvoices[key].MaxQty = rec.Qty
+			clientInvoices[key].Cnt = 1
+			ord++
 		}
 	}
 
 	ret := make([]Invoice, 0)
 	for _, inv := range clientInvoices {
-		inv.Quantity = fmt.Sprintf("%.2f", inv.Qty)
-		inv.Total = fmt.Sprintf("%.2f", inv.Tot)
+		if inv.CardID != "" {
+			inv.Quantity = fmt.Sprintf("%.2f", inv.Qty)
+			inv.Total = fmt.Sprintf("%.2f", inv.Tot)
+		}
 		ret = append(ret, *inv)
 	}
+	sort.Slice(ret, func(i1 int, i2 int) bool {
+		return ret[i1].Ord < ret[i2].Ord
+	})
 	return ret, nil
 }
 
