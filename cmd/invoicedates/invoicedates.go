@@ -15,9 +15,9 @@ import (
 )
 
 type Invoice struct {
-	Ord             int     `csv:"_"`
-	Cnt             int     `csv:"_"`
-	Recs            string  `csv:"_"`
+	Ord             int     `csv:"Ord"`
+	Cnt             int     `csv:"Cnt"`
+	Recs            string  `csv:"Recs"`
 	FirstName       string  `csv:"Client First Name"`
 	LastName        string  `csv:"Client Last Name"`
 	CardID          string  `csv:"Card ID"`
@@ -46,7 +46,7 @@ type Invoice struct {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("usage: invoicedates <invoice>.txt")
+		fmt.Println("usage: invoicedates <invoice>.txt [-d]")
 		fmt.Println("   that will produce <invoice>_out.txt")
 		return
 	}
@@ -55,6 +55,11 @@ func main() {
 	ext := filepath.Ext(fileName)
 	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
 	fileNameOutAll := fileName[:len(fileName)-len(ext)] + "_all" + ext
+
+	isDebug := false
+	if len(os.Args) > 2 && os.Args[2] == "-d" {
+		isDebug = true
+	}
 
 	invoices, err := readInvoices(fileName)
 	if err != nil {
@@ -66,9 +71,11 @@ func main() {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
 
-	err = writeInvoices(invoices, fileNameOutAll)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
+	if isDebug {
+		err = writeInvoices(isDebug, invoices, fileNameOutAll)
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
+		}
 	}
 
 	invoices, err = sumUpInvoices(invoices)
@@ -76,7 +83,7 @@ func main() {
 		log.Fatal(fmt.Sprintf("Can't summup invoices: %v", err))
 	}
 
-	err = writeInvoices(invoices, fileNameOut)
+	err = writeInvoices(isDebug, invoices, fileNameOut)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
 	}
@@ -203,10 +210,50 @@ func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 	return ret, nil
 }
 
-func writeInvoices(invoices []Invoice, filename string) error {
+func writeInvoices(isDebug bool, invoices []Invoice, filename string) error {
 	b, err := csvutil.Marshal(invoices)
 	if err != nil {
 		fmt.Println("error:", err)
+	}
+	if !isDebug {
+		type _invoice struct {
+			Ord             int     `csv:"_"`
+			Cnt             int     `csv:"_"`
+			Recs            string  `csv:"_"`
+			FirstName       string  `csv:"Client First Name"`
+			LastName        string  `csv:"Client Last Name"`
+			CardID          string  `csv:"Card ID"`
+			Job             string  `csv:"Job"`
+			Account         string  `csv:"Account N"`
+			TaxCode         string  `csv:"Tax Code"`
+			Description     string  `csv:"Description"`
+			Date            string  `csv:"Date"`
+			Total           string  `csv:"Total"`
+			Price           string  `csv:"Price"`
+			ItemNumber      string  `csv:"Item Number"`
+			Quantity        string  `csv:"Quantity"`
+			Category        string  `csv:"Category"`
+			CustomerPO      string  `csv:"CustomerPO n."`
+			SalesPerson     string  `csv:"Salesperson Name"`
+			Refferal        string  `csv:"Referral Source"`
+			ServiceDateFrom string  `csv:"Service Date From"`
+			ServiceDateTo   string  `csv:"Service Date To"`
+			Memo            string  `csv:"Journal Memo"`
+			Comments        string  `csv:"Comments"`
+			Reference       string  `csv:"Invoice Reference"`
+			Tot             float32 `csv:"-"`
+			Qty             float32 `csv:"-"`
+			MaxQty          float32 `csv:"-"`
+		}
+		_invoices := make([]_invoice, len(invoices))
+		for i, inv := range invoices {
+			_inv := _invoice(inv)
+			_invoices[i] = _inv
+		}
+		b, err = csvutil.Marshal(_invoices)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
 	}
 	bb := []byte("{}\n")
 	bb = append(bb, b...)
@@ -223,11 +270,6 @@ func reformatDate(date string) string {
 }
 
 var codes = map[string]bool{
-	"07_002_0106_8_3":    true,
-	"01_134_0117_8_1":    true,
-	"01_022_0120_1_1":    true,
-	"01_020_0120_1_1":    true,
-	"01_019_0120_1_1":    true,
 	"04_590_0125_6_1":    true,
 	"04_591_0136_6_1":    true,
 	"04_592_0104_6_1":    true,

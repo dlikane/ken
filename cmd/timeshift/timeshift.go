@@ -81,6 +81,7 @@ type CsvShift struct {
 	Allowance string  `csv:"Allowance"`
 	ActualFirst float64  `csv:"ActualFirst"`
 	ActualSecond float64  `csv:"ActualSecond"`
+	IsShort bool  `csv:"IsShort"`
 }
 
 func main() {
@@ -286,6 +287,27 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					}
 				}
 
+				isShort := false
+				if shiftDuration < 2 {
+					isJoined := false
+					if j > 0 {
+						prevSh := shift.ShiftHours[j-1]
+						if prevSh.FinishTime == sh.StartTime {
+							isJoined = true
+						}
+					}
+					if j < len(shift.ShiftHours)-1 {
+						nextSh := shift.ShiftHours[j+1]
+						if nextSh.StartTime == sh.FinishTime {
+							isJoined = true
+						}
+					}
+					if !isJoined {
+						isShort = true
+					}
+				}
+
+
 				csvShifts = append(csvShifts, CsvShift{
 					FullName:  tc.EmployeeName,
 					Date:      printDate(sh.StartTime),
@@ -294,6 +316,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					Allowance: strAllowance,
 					ActualFirst: actualFirst,
 					ActualSecond: actualSecond,
+					IsShort: isShort,
 				})
 
 				shiftNdx++
