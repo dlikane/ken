@@ -21,24 +21,6 @@
                 <Job/>
             </ShiftHours>
         </Shift>
-        <Shift>
-            <ShiftHours>
-                <StartTime>2023-01-06T17:30:00</StartTime>
-                <FinishTime>2023-01-06T19:30:00</FinishTime>
-                <Break>00:00</Break>
-                <Department>INHOME</Department>
-                <Job/>
-            </ShiftHours>
-        </Shift>
-        <Shift>
-            <ShiftHours>
-                <StartTime>2023-01-06T20:30:00</StartTime>
-                <FinishTime>2023-01-06T22:30:00</FinishTime>
-                <Break>00:00</Break>
-                <Department>INHOME</Department>
-                <Job/>
-            </ShiftHours>
-        </Shift>
         <TotalHours>69.5</TotalHours>
     </TimeCard>
 </TimeCards>

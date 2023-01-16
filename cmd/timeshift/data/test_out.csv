@@ -1,6 +1,4 @@
 {}
 Full Name,Date,Shift,Break,Allowance,ActualFirst,ActualSecond,IsShort
-Papelera Almira,2023-01-06,07:30 - 09:00,0,,0,0,true
+Papelera Almira,2023-01-06,07:30 - 09:00,0,,0,0,false
 Papelera Almira,2023-01-06,09:00 - 15:30,0,,0,0,false
-Papelera Almira,2023-01-06,17:30 - 19:30,2,First,2,0,false
-Papelera Almira,2023-01-06,20:30 - 22:30,1,Second,0,1,false

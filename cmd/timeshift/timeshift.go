@@ -74,14 +74,14 @@ type TimeCards struct {
 }
 
 type CsvShift struct {
-	FullName  string  `csv:"Full Name"`
-	Date      string  `csv:"Date"`
-	Shift     string  `csv:"Shift"`
-	Break     float64 `csv:"Break"`
-	Allowance string  `csv:"Allowance"`
-	ActualFirst float64  `csv:"ActualFirst"`
-	ActualSecond float64  `csv:"ActualSecond"`
-	IsShort bool  `csv:"IsShort"`
+	FullName     string  `csv:"Full Name"`
+	Date         string  `csv:"Date"`
+	Shift        string  `csv:"Shift"`
+	Break        float64 `csv:"Break"`
+	Allowance    string  `csv:"Allowance"`
+	ActualFirst  float64 `csv:"ActualFirst"`
+	ActualSecond float64 `csv:"ActualSecond"`
+	IsShort      bool    `csv:"IsShort"`
 }
 
 func main() {
@@ -215,7 +215,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		shiftNdx := 0
 		var previousShift *ShiftHours
 		isOvernight := false
-		for _, shift := range tc.Shift {
+		for i, shift := range tc.Shift {
 			for j, sh := range shift.ShiftHours {
 				// is new day
 				if previousShift != nil && truncateToDay(sh.StartTime) != truncateToDay(previousShift.StartTime) {
@@ -241,11 +241,11 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					breakDuration = time.Time(sh.StartTime).Sub(time.Time(previousShift.FinishTime)).Hours()
 					if breakDuration < 0 {
 						msg := fmt.Sprintf(
-							"prev: StartTime: %s FinishTime: %s sh: StartTime: %s FinishTime: %s", 
+							"prev: StartTime: %s FinishTime: %s sh: StartTime: %s FinishTime: %s",
 							time.Time(previousShift.StartTime).Format("2006-01-02 15:04"),
 							time.Time(previousShift.FinishTime).Format("2006-01-02 15:04"),
-							time.Time(sh.StartTime).Format("2006-01-02 15:04"), 
-							time.Time(sh.FinishTime).Format("2006-01-02 15:04"), 
+							time.Time(sh.StartTime).Format("2006-01-02 15:04"),
+							time.Time(sh.FinishTime).Format("2006-01-02 15:04"),
 						)
 						log.Println(msg)
 					}
@@ -263,9 +263,9 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					if breakDuration > 0 {
 						cntBreaks++
 					}
-					if cntAllowances == 0 && 
-						((breakDuration > 1 || (breakDuration > 0 && (continuesShift > 5 || shiftDuration > 5))) || 
-						(breakDuration > 0 && cntBreaks > 1)) {
+					if cntAllowances == 0 &&
+						((breakDuration > 1 || (breakDuration > 0 && (continuesShift > 5 || shiftDuration > 5))) ||
+							(breakDuration > 0 && cntBreaks > 1)) {
 						strAllowance = "First"
 						allowances = append(allowances, Allowance{
 							Type:        "Unit",
@@ -290,33 +290,40 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 				isShort := false
 				if shiftDuration < 2 {
 					isJoined := false
+					var prevSh *ShiftHours
 					if j > 0 {
-						prevSh := shift.ShiftHours[j-1]
-						if prevSh.FinishTime == sh.StartTime {
-							isJoined = true
-						}
+						prevSh = &shift.ShiftHours[j-1]
 					}
+					if j == 0 && i > 0 {
+						prevSh = &tc.Shift[i-1].ShiftHours[len(tc.Shift[i-1].ShiftHours)-1]
+					}
+					if prevSh != nil && prevSh.FinishTime == sh.StartTime {
+						isJoined = true
+					}
+					var nextSh *ShiftHours
 					if j < len(shift.ShiftHours)-1 {
-						nextSh := shift.ShiftHours[j+1]
-						if nextSh.StartTime == sh.FinishTime {
-							isJoined = true
-						}
+						nextSh = &shift.ShiftHours[j+1]
+					}
+					if j == len(shift.ShiftHours)-1 && i < len(tc.Shift)-1 {
+						nextSh = &tc.Shift[i+1].ShiftHours[0]
+					}
+					if nextSh != nil && nextSh.StartTime == sh.FinishTime {
+						isJoined = true
 					}
 					if !isJoined {
 						isShort = true
 					}
 				}
 
-
 				csvShifts = append(csvShifts, CsvShift{
-					FullName:  tc.EmployeeName,
-					Date:      printDate(sh.StartTime),
-					Shift:     printStartFinish(sh),
-					Break:     breakDuration,
-					Allowance: strAllowance,
-					ActualFirst: actualFirst,
+					FullName:     tc.EmployeeName,
+					Date:         printDate(sh.StartTime),
+					Shift:        printStartFinish(sh),
+					Break:        breakDuration,
+					Allowance:    strAllowance,
+					ActualFirst:  actualFirst,
 					ActualSecond: actualSecond,
-					IsShort: isShort,
+					IsShort:      isShort,
 				})
 
 				shiftNdx++
@@ -329,10 +336,10 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		for _, a := range allowances {
 			if a.AllowanceNo == "First Broken" {
 				totalFirstCnt++
-			} 
+			}
 			if a.AllowanceNo == "Second Broken" {
 				totalSecondCnt++
-			} 
+			}
 		}
 		if totalFirstCnt > 0 {
 			timeCards.TimeCards[i].Allowance = append(timeCards.TimeCards[i].Allowance, Allowance{

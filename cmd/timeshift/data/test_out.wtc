@@ -19,26 +19,6 @@
 				<Job></Job>
 			</ShiftHours>
 		</Shift>
-		<Shift>
-			<ShiftHours>
-				<StartTime>2023-01-06T17:30:00</StartTime>
-				<FinishTime>2023-01-06T19:30:00</FinishTime>
-				<Department>INHOME</Department>
-				<Job></Job>
-			</ShiftHours>
-		</Shift>
-		<Shift>
-			<ShiftHours>
-				<StartTime>2023-01-06T20:30:00</StartTime>
-				<FinishTime>2023-01-06T22:30:00</FinishTime>
-				<Department>INHOME</Department>
-				<Job></Job>
-			</ShiftHours>
-		</Shift>
-		<Allowance Type="Unit">
-			<AllowanceNo>Second Broken</AllowanceNo>
-			<Value>1</Value>
-		</Allowance>
 		<TotalHours>69.5</TotalHours>
 	</TimeCard>
 </TimeCards>
