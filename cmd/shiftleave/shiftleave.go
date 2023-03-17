@@ -10,9 +10,12 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
+	"syscall"
 	"time"
 
 	"github.com/jszwec/csvutil"
+	"golang.org/x/term"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,7 +24,7 @@ import (
 var server = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
 var port = 6033
 var user = "skillsconn_bi"
-var password = "mbq.HPH2uvp4adu.dnk"
+var password = ""
 var dbname = "flg_skillsconn"
 
 type xmlTime time.Time
@@ -68,6 +71,13 @@ type Allowance struct {
 	Value       float32 `xml:"Value"`
 }
 
+type Leave struct {
+	Type     string   `xml:"Type,attr"`
+	Hours    float32  `xml:"Hours,attr"`
+	FromDate *xmlTime `xml:"FromDate,omitempty"`
+	ToDate   *xmlTime `xml:"ToDate,omitempty"`
+}
+
 type TimeCard struct {
 	XMLName      xml.Name    `xml:"TimeCard"`
 	TimeCardNo   string      `xml:"TimeCardNo"`
@@ -75,6 +85,7 @@ type TimeCard struct {
 	Shift        []Shift     `xml:"Shift"`
 	Allowance    []Allowance `xml:"Allowance,omitempty"`
 	TotalHours   float32     `xml:"TotalHours"`
+	Leave        []Leave     `xmld:"Leave,omitempty"`
 }
 
 type TimeCards struct {
@@ -94,63 +105,9 @@ type CsvShift struct {
 	IsShort      bool    `csv:"IsShort"`
 }
 
-func main() {
-	log.Printf("started\n")
-	if len(os.Args) < 2 {
-		fmt.Println("usage: timeshift <timesheet>.xml")
-		fmt.Println("   that will produce <timesheet>_out.xml")
-		return
-	}
-
-	fileName := os.Args[1]
-	ext := filepath.Ext(fileName)
-	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
-	csvFileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ".csv"
-
-	leaveData, err := readLeaveData()
-
-	timeCards, err := readCards(fileName)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Can't parse file: %s: %v", fileName, err))
-	}
-
-	csvShifts, err := processAllowances(timeCards)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("process allowances: %v", err))
-	}
-
-	err = processCards(timeCards)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("process cards: %v", err))
-	}
-
-	err = writeCsvShifts(csvShifts, csvFileNameOut)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("writting csvs: %v", err))
-	}
-
-	err = writeCards(timeCards, fileNameOut)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
-	}
-}
-
-
 type LeaveData map[string]map[string]float32
 
-
-func readLeaveData() *LeaveData, err {
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, server, port, dbname)
-	db, err := sql.Open("mysql", connString)
-
-	if err != nil {
-		log.Fatal("Error creating connection pool: " + err.Error())
-	}
-	defer db.Close()
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-	query := `SELECT 
+const LeaveQuery = `SELECT 
     roster_employee_name AS Staff,
     library_name AS Field,
     attribute_value AS Value
@@ -172,24 +129,109 @@ WHERE
         AND s.shape_name like 'Leave%'
         and length(l.library_name) = 3
         AND attribute_islatest = 'yes'
-group BY o.object_uid , s.shape_id , l.library_id, attribute_revision`
+group BY o.object_uid , s.shape_id , l.library_id, attribute_revision
+`
 
-	rows, err := db.Query(query, from, to, from, to)
+func credentials() (string, error) {
+	fmt.Print("Enter Password: ")
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
-		return err
+		return "", err
 	}
-	var staff string
-	var field string
-	var value float32
-	for rows.Next() {
-		// read the row on the table; it has five fields, and here we are
-		// assigning them to the variables declared above
-		err := rows.Scan(&id, &name, &email, &phone_number, &birth_date)
+	password := string(bytePassword)
+	return strings.TrimSpace(password), nil
+}
+
+func main() {
+	log.Printf("started\n")
+	if len(os.Args) < 2 {
+		fmt.Println("usage: shiftleave <timesheet>.wtc")
+		fmt.Println("   that will produce <timesheet>_out.xtc and <timesheet_out>.csv")
+		return
+	}
+
+	var err error
+	if password == "" {
+		password, err = credentials()
 		if err != nil {
-			return nil, err
+			log.Fatal(fmt.Sprintf("Error getting password: %v", err))
 		}
 	}
 
+	fileName := os.Args[1]
+	ext := filepath.Ext(fileName)
+	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
+	csvFileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ".csv"
+
+	leaveData, err := readLeaveData()
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Error loading data from DB: %v", err))
+	}
+	log.Printf("loaded %d staff from DB", len(leaveData))
+
+	timeCards, err := readCards(fileName)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Can't parse file: %s: %v", fileName, err))
+	}
+
+	csvShifts, err := processAllowances(timeCards)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("process allowances: %v", err))
+	}
+
+	err = processCards(timeCards)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("process cards: %v", err))
+	}
+
+	err = processLeaves(timeCards, leaveData)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("process leaves: %v", err))
+	}
+
+	err = writeCsvShifts(csvShifts, csvFileNameOut)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("writting csvs: %v", err))
+	}
+
+	err = writeCards(timeCards, fileNameOut)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
+	}
+}
+
+func readLeaveData() (LeaveData, error) {
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, server, port, dbname)
+	db, err := sql.Open("mysql", connString)
+
+	if err != nil {
+		log.Fatal("Error creating connection pool: " + err.Error())
+	}
+	defer db.Close()
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	rows, err := db.Query(LeaveQuery)
+	if err != nil {
+		return nil, err
+	}
+	var name string
+	var field string
+	var value float32
+	leaveData := make(LeaveData)
+	for rows.Next() {
+		err := rows.Scan(&name, &field, &value)
+		if err != nil {
+			return nil, err
+		}
+		staff, ok := leaveData[name]
+		if !ok {
+			staff = make(map[string]float32)
+			leaveData[name] = staff
+		}
+		staff[field] = value
+	}
+	return leaveData, nil
 }
 
 func readCards(fileName string) (*TimeCards, error) {
@@ -270,6 +312,57 @@ func processCards(timeCards *TimeCards) error {
 			return time.Time(s1.StartTime).Before(time.Time(s2.StartTime))
 		})
 
+	}
+	return nil
+}
+
+func leaveDataHasStaff(leaveData LeaveData, name string) bool {
+	_, ok := leaveData[name]
+	return ok
+}
+
+func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int) (float32, error) {
+	date := time.Time(fromDate).Add(time.Hour * time.Duration(24*dayOffset))
+	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()%6]
+	hours, ok := leaveData[name][weekDay]
+	if !ok {
+		return 0, nil
+	}
+	return hours, nil
+}
+
+func processLeaves(timeCards *TimeCards, leaveData LeaveData) error {
+	dayOffset := 0
+	currentType := ""
+	for i, tc := range timeCards.TimeCards {
+		isStaff := leaveDataHasStaff(leaveData, tc.EmployeeName)
+		for j, leave := range tc.Leave {
+			switch leave.Type {
+			case "Time in Lieu":
+				if isStaff {
+					timeCards.TimeCards[i].Leave[j].Type = "Accrued Days"
+				} else {
+					timeCards.TimeCards[i].Leave[j].Type = "ADO"
+				}
+			case "Annual", "Sick", "Long Service", "Compassionate":
+				if isStaff && leave.Hours == 7.6 {
+					if currentType != leave.Type {
+						dayOffset = 0
+					}
+					currentType = leave.Type
+					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, dayOffset)
+					if err != nil {
+						return err
+					}
+					timeCards.TimeCards[i].Leave[j].Hours = hours
+					dayOffset++
+				}
+			}
+			timeCards.TimeCards[i].Leave[j].FromDate = nil
+			timeCards.TimeCards[i].Leave[j].ToDate = nil
+		}
+		dayOffset = 0
+		currentType = ""
 	}
 	return nil
 }

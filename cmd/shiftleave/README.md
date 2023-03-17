@@ -22,3 +22,5 @@ Sample timecard with leave and allowances below (timeshift.go already creates br
         <Leave Type="Sick" Hours="7.6">
         <Leave Type="Long Service" Hours="7.6">
 3. if it is <Leave Type="Time in Lieu" Hours="7.6"> keep hours as it is but change to 'Accrued Days' if it in sql response and 'ADO' if not
+
+Elizabeth Graham
