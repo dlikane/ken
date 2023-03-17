@@ -1,0 +1,269 @@
+<?xml version="1.0"?>
+<TimeCards Version="2.3">
+    <TimeCard>
+        <TimeCardNo>POWA</TimeCardNo>
+        <EmployeeName>Alan Powell</EmployeeName>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-15T00:00:00</FromDate>
+            <ToDate>2022-06-16T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-15T00:00:00</FromDate>
+            <ToDate>2022-06-16T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>15.2</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>GRAE</TimeCardNo>
+        <EmployeeName>Elizabeth Graham</EmployeeName>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-05-16T00:00:00</FromDate>
+            <ToDate>2022-08-25T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>106.4</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>BURE</TimeCardNo>
+        <EmployeeName>Emily Burns</EmployeeName>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-13T00:00:00</FromDate>
+            <ToDate>2022-06-13T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="3.5">
+            <FromDate>2022-06-24T13:00:00</FromDate>
+            <ToDate>2022-06-24T16:30:00</ToDate>
+        </Leave>
+        <TotalHours>11.1</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>HILF</TimeCardNo>
+        <EmployeeName>Franciscus Hillege</EmployeeName>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-14T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-14T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-14T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2022-06-14T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-21T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-21T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-21T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-21T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>60.8</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>JAMG</TimeCardNo>
+        <EmployeeName>Gayle James</EmployeeName>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-26T00:00:00</FromDate>
+            <ToDate>2022-06-30T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>7.6</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>HAYH</TimeCardNo>
+        <EmployeeName>Heather Milburn</EmployeeName>
+        <Leave Type="Sick" Hours="2">
+            <FromDate>2022-06-24T12:00:00</FromDate>
+            <ToDate>2022-06-24T14:00:00</ToDate>
+        </Leave>
+        <TotalHours>2</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>ROWH2</TimeCardNo>
+        <EmployeeName>Heather Rowe</EmployeeName>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-24T00:00:00</FromDate>
+            <ToDate>2022-07-10T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-24T00:00:00</FromDate>
+            <ToDate>2022-07-10T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-24T00:00:00</FromDate>
+            <ToDate>2022-07-10T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Compassionate" Hours="3">
+            <FromDate>2022-06-16T13:00:00</FromDate>
+            <ToDate>2022-06-16T16:00:00</ToDate>
+        </Leave>
+        <TotalHours>25.8</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>JOHI</TimeCardNo>
+        <EmployeeName>Ian Johnson</EmployeeName>
+        <Leave Type="Time in Lieu" Hours="7.6">
+            <FromDate>2022-06-22T00:00:00</FromDate>
+            <ToDate>2022-06-22T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>7.6</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>KENJ</TimeCardNo>
+        <EmployeeName>John Kennedy</EmployeeName>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-16T00:00:00</FromDate>
+            <ToDate>2022-06-16T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>7.6</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>HENK</TimeCardNo>
+        <EmployeeName>Kellie Hennigan</EmployeeName>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-22T00:00:00</FromDate>
+            <ToDate>2022-06-22T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>7.6</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>LEEM</TimeCardNo>
+        <EmployeeName>Megan Leersen</EmployeeName>
+        <Leave Type="Compassionate" Hours="9">
+            <FromDate>2022-06-22T10:00:00</FromDate>
+            <ToDate>2022-06-22T19:00:00</ToDate>
+        </Leave>
+        <TotalHours>9</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>QUATA</TimeCardNo>
+        <EmployeeName>Tara Pownceby</EmployeeName>
+        <Leave Type="Sick" Hours="3">
+            <FromDate>2022-06-14T14:00:00</FromDate>
+            <ToDate>2022-06-14T17:00:00</ToDate>
+        </Leave>
+        <TotalHours>3</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>BRYT</TimeCardNo>
+        <EmployeeName>Tracey Brytcz</EmployeeName>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-24T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-13T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-13T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-13T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-13T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Long Service" Hours="7.6">
+            <FromDate>2022-06-13T00:00:00</FromDate>
+            <ToDate>2022-06-17T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>76</TotalHours>
+    </TimeCard>
+    <TimeCard>
+        <TimeCardNo>ANGV</TimeCardNo>
+        <EmployeeName>Vickie Angus</EmployeeName>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-21T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Sick" Hours="7.6">
+            <FromDate>2022-06-20T00:00:00</FromDate>
+            <ToDate>2022-06-21T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>15.2</TotalHours>
+    </TimeCard>
+</TimeCards>
