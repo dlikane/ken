@@ -24,7 +24,7 @@ import (
 var server = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
 var port = 6033
 var user = "skillsconn_bi"
-var password = "mbq.HPH2uvp4adu.dnk"
+var password = ""
 var dbname = "flg_skillsconn"
 
 type xmlTime time.Time
@@ -132,6 +132,10 @@ WHERE
 group BY o.object_uid , s.shape_id , l.library_id, attribute_revision
 `
 
+const HolidaysQuery = `SELECT rs_pubhol_date as Holiday FROM flg_skillsconn.roster_public_holidays`
+
+type HolidayData map[time.Time]time.Time
+
 func credentials() (string, error) {
 	fmt.Print("Enter Password: ")
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
@@ -173,6 +177,12 @@ func main() {
 	}
 	log.Printf("loaded %d staff from DB", len(leaveData))
 
+	HolidayData, err := readHolidays()
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Error loading holiday data from DB: %v", err))
+	}
+	log.Printf("loaded %d holidays from DB", len(HolidayData))
+
 	timeCards, err := readCards(fileName)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't parse file: %s: %v", fileName, err))
@@ -188,7 +198,7 @@ func main() {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
 
-	err = processLeaves(timeCards, leaveData)
+	err = processLeaves(timeCards, leaveData, HolidayData)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("process leaves: %v", err))
 	}
@@ -243,6 +253,33 @@ func readLeaveData() (LeaveData, error) {
 		staff[field] = value
 	}
 	return leaveData, nil
+}
+
+func readHolidays() (HolidayData, error) {
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", user, password, server, port, dbname)
+	db, err := sql.Open("mysql", connString)
+
+	if err != nil {
+		log.Fatal("Error creating connection pool: " + err.Error())
+	}
+	defer db.Close()
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	rows, err := db.Query(HolidaysQuery)
+	if err != nil {
+		return nil, err
+	}
+	var date time.Time
+	holidayData := make(HolidayData)
+	for rows.Next() {
+		err := rows.Scan(&date)
+		if err != nil {
+			return nil, err
+		}
+		holidayData[date] = date
+	}
+	return holidayData, nil
 }
 
 func readCards(fileName string) (*TimeCards, error) {
@@ -332,8 +369,11 @@ func leaveDataHasStaff(leaveData LeaveData, name string) bool {
 	return ok
 }
 
-func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int) (float32, error) {
+func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int, holidayData HolidayData) (float32, error) {
 	date := time.Time(fromDate).Add(time.Hour * time.Duration(24*dayOffset))
+	if _, isHoliday := holidayData[date]; isHoliday {
+		return 0, nil
+	}
 	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()%6]
 	hours, ok := leaveData[sortName(name)][weekDay]
 	if !ok {
@@ -342,7 +382,7 @@ func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffse
 	return hours, nil
 }
 
-func processLeaves(timeCards *TimeCards, leaveData LeaveData) error {
+func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData HolidayData) error {
 	dayOffset := 0
 	currentType := ""
 	for i, tc := range timeCards.TimeCards {
@@ -361,7 +401,7 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData) error {
 						dayOffset = 0
 					}
 					currentType = leave.Type
-					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, dayOffset)
+					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, dayOffset, holidayData)
 					if err != nil {
 						return err
 					}
