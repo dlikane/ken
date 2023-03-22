@@ -1,22 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TimeCards Version="2.3">
 	<TimeCard>
-		<TimeCardNo>GRAE</TimeCardNo>
-		<EmployeeName>Elizabeth Graham</EmployeeName>
-		<TotalHours>106.4</TotalHours>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="8"></Leave>
-		<Leave Type="Long Service" Hours="8"></Leave>
-		<Leave Type="Long Service" Hours="8"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="8"></Leave>
-		<Leave Type="Long Service" Hours="8"></Leave>
-		<Leave Type="Long Service" Hours="8"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
-		<Leave Type="Long Service" Hours="0"></Leave>
+		<TimeCardNo>POWA</TimeCardNo>
+		<EmployeeName>Powell Alan</EmployeeName>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-06T08:30:00</StartTime>
+				<FinishTime>2023-03-06T11:45:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+			<ShiftHours>
+				<StartTime>2023-03-06T12:15:00</StartTime>
+				<FinishTime>2023-03-06T15:30:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-06T16:00:00</StartTime>
+				<FinishTime>2023-03-06T18:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-08T09:00:00</StartTime>
+				<FinishTime>2023-03-08T16:00:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-09T08:30:00</StartTime>
+				<FinishTime>2023-03-09T13:00:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-10T09:00:00</StartTime>
+				<FinishTime>2023-03-10T12:00:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+			<ShiftHours>
+				<StartTime>2023-03-10T12:30:00</StartTime>
+				<FinishTime>2023-03-10T15:30:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-11T10:00:00</StartTime>
+				<FinishTime>2023-03-11T15:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-14T08:30:00</StartTime>
+				<FinishTime>2023-03-14T15:30:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-15T09:00:00</StartTime>
+				<FinishTime>2023-03-15T12:15:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+			<ShiftHours>
+				<StartTime>2023-03-15T12:45:00</StartTime>
+				<FinishTime>2023-03-15T16:00:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-03-16T08:30:00</StartTime>
+				<FinishTime>2023-03-16T13:00:00</FinishTime>
+				<Department>13</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Allowance Type="Unit">
+			<AllowanceNo>First Broken</AllowanceNo>
+			<Value>1</Value>
+		</Allowance>
+		<TotalHours>58.1</TotalHours>
+		<Leave Type="Annual" Hours="6.5"></Leave>
 	</TimeCard>
 </TimeCards>

@@ -24,7 +24,7 @@ import (
 var server = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
 var port = 6033
 var user = "skillsconn_bi"
-var password = ""
+var password = "mbq.HPH2uvp4adu.dnk"
 var dbname = "flg_skillsconn"
 
 type xmlTime time.Time
@@ -204,6 +204,12 @@ func main() {
 	}
 }
 
+func sortName(s string) string {
+	words := strings.Fields(s)
+	sort.Strings(words)
+	return strings.Join(words, " ")
+}
+
 func readLeaveData() (LeaveData, error) {
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, server, port, dbname)
 	db, err := sql.Open("mysql", connString)
@@ -225,6 +231,7 @@ func readLeaveData() (LeaveData, error) {
 	leaveData := make(LeaveData)
 	for rows.Next() {
 		err := rows.Scan(&name, &field, &value)
+		name = sortName(name)
 		if err != nil {
 			return nil, err
 		}
@@ -321,14 +328,14 @@ func processCards(timeCards *TimeCards) error {
 }
 
 func leaveDataHasStaff(leaveData LeaveData, name string) bool {
-	_, ok := leaveData[name]
+	_, ok := leaveData[sortName(name)]
 	return ok
 }
 
 func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int) (float32, error) {
 	date := time.Time(fromDate).Add(time.Hour * time.Duration(24*dayOffset))
 	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()%6]
-	hours, ok := leaveData[name][weekDay]
+	hours, ok := leaveData[sortName(name)][weekDay]
 	if !ok {
 		return 0, nil
 	}
