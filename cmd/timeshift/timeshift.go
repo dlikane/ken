@@ -406,8 +406,10 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 						return err
 					}
 					timeCards.TimeCards[i].Leave[j].Hours = hours
-					dayOffset++
+				} else if !isStaff {
+					timeCards.TimeCards[i].Leave[j].Hours = 0
 				}
+				dayOffset++
 			}
 			timeCards.TimeCards[i].Leave[j].FromDate = nil
 			timeCards.TimeCards[i].Leave[j].ToDate = nil
