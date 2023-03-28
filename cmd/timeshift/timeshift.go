@@ -411,8 +411,8 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 				}
 				dayOffset++
 			}
-			timeCards.TimeCards[i].Leave[j].FromDate = nil
-			timeCards.TimeCards[i].Leave[j].ToDate = nil
+			timeCards.TimeCards[i].Leave[j].FromDate = leave.FromDate
+			timeCards.TimeCards[i].Leave[j].ToDate = leave.ToDate
 		}
 		dayOffset = 0
 		currentType = ""
