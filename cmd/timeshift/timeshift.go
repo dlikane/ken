@@ -227,7 +227,7 @@ func main() {
 
 func parseDate(arg string) (time.Time, time.Time, error) {
 	toDate, err := time.Parse("20060102", arg)
-	fromDate := toDate.AddDate(0, 0, -14)
+	fromDate := toDate.AddDate(0, 0, -13)
 	return fromDate, toDate, err
 }
 
@@ -439,20 +439,18 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 
 func minDate(xmlDate1 *xmlTime, date2 time.Time) *xmlTime {
 	date1 := time.Time(*xmlDate1)
-	var ret xmlTime
+	ret := xmlTime(date2)
 	if date1.Before(date2) {
 		ret = xmlTime(date1)
 	}
-	ret = xmlTime(date2)
 	return &ret
 }
 func maxDate(xmlDate1 *xmlTime, date2 time.Time) *xmlTime {
 	date1 := time.Time(*xmlDate1)
-	var ret xmlTime
+	ret := xmlTime(date1)
 	if date1.Before(date2) {
 		ret = xmlTime(date2)
 	}
-	ret = xmlTime(date1)
 	return &ret
 }
 
