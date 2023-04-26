@@ -412,9 +412,9 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 			switch leave.Type {
 			case "Time in Lieu":
 				if isStaff {
-					timeCards.TimeCards[i].Leave[j].Type = "Accrued Days"
-				} else {
 					timeCards.TimeCards[i].Leave[j].Type = "ADO"
+				} else {
+					timeCards.TimeCards[i].Leave[j].Type = "Accrued Days"
 				}
 			case "Annual", "Sick", "Long Service", "Compassionate":
 				if isStaff && leave.Hours == 7.6 {
