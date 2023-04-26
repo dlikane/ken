@@ -336,10 +336,6 @@ func processCards(timeCards *TimeCards) error {
 		for j, shift := range tc.Shift {
 			arr := make([]ShiftHours, 0)
 			for _, sh := range shift.ShiftHours {
-				// exclude training and admin
-				if sh.Department == "TRAIN" || sh.Department == "92" {
-					continue
-				}
 				if sh.Break != nil && *sh.Break != "00:00" {
 					start := time.Time(sh.StartTime)
 					finish := time.Time(sh.FinishTime)
@@ -472,6 +468,11 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		isOvernight := false
 		for i, shift := range tc.Shift {
 			for j, sh := range shift.ShiftHours {
+				// exclude training and admin
+				if sh.Department == "TRAIN" || sh.Department == "92" {
+					continue
+				}
+
 				// is new day
 				if previousShift != nil && truncateToDay(sh.StartTime) != truncateToDay(previousShift.StartTime) {
 					shiftNdx = 0
