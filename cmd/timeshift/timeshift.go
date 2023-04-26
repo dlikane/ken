@@ -21,15 +21,47 @@ import (
 )
 
 // Replace with your own connection parameters
-var server = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
-var port = 6033
-var user = "skillsconn_bi"
-var password = ""
-var dbname = "flg_skillsconn"
+var (
+	server   = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
+	port     = 6033
+	user     = "skillsconn_bi"
+	password = ""
+	dbname   = "flg_skillsconn"
+	fromDate time.Time
+	toDate   time.Time
+)
+
+const (
+	xmlTimeFormat = `2006-01-02T15:04:05`
+
+	LeaveQuery = `SELECT 
+    roster_employee_name AS Staff,
+    library_name AS Field,
+    attribute_value AS Value
+FROM
+    roster_employee e,
+    globe_object_has_globe_shape o,
+    globe_shape s,
+    globe_library l,
+    globe_attribute t
+WHERE
+    e.roster_employee_globeuid = o.object_uid
+        AND o.shape_id = s.shape_id
+        AND library_shape_id = s.shape_id
+        AND l.library_id = t.library_id
+        AND e.roster_employee_globeuid = t.object_uid
+        AND o.ohs_id = t.ohs_id
+        AND roster_employee_deleted = 'no'
+        AND o.ohs_deleted = 'no'
+        AND s.shape_name like 'Leave%'
+        and length(l.library_name) = 3
+        AND attribute_islatest = 'yes'
+group BY o.object_uid , s.shape_id , l.library_id, attribute_revision
+`
+	HolidaysQuery = `SELECT rs_pubhol_date as Holiday FROM flg_skillsconn.roster_public_holidays`
+)
 
 type xmlTime time.Time
-
-const xmlTimeFormat = `2006-01-02T15:04:05`
 
 func (ct xmlTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	t := time.Time(ct)
@@ -107,33 +139,6 @@ type CsvShift struct {
 
 type LeaveData map[string]map[string]float32
 
-const LeaveQuery = `SELECT 
-    roster_employee_name AS Staff,
-    library_name AS Field,
-    attribute_value AS Value
-FROM
-    roster_employee e,
-    globe_object_has_globe_shape o,
-    globe_shape s,
-    globe_library l,
-    globe_attribute t
-WHERE
-    e.roster_employee_globeuid = o.object_uid
-        AND o.shape_id = s.shape_id
-        AND library_shape_id = s.shape_id
-        AND l.library_id = t.library_id
-        AND e.roster_employee_globeuid = t.object_uid
-        AND o.ohs_id = t.ohs_id
-        AND roster_employee_deleted = 'no'
-        AND o.ohs_deleted = 'no'
-        AND s.shape_name like 'Leave%'
-        and length(l.library_name) = 3
-        AND attribute_islatest = 'yes'
-group BY o.object_uid , s.shape_id , l.library_id, attribute_revision
-`
-
-const HolidaysQuery = `SELECT rs_pubhol_date as Holiday FROM flg_skillsconn.roster_public_holidays`
-
 type HolidayData map[time.Time]time.Time
 
 func credentials() (string, error) {
@@ -148,14 +153,15 @@ func credentials() (string, error) {
 
 func main() {
 	log.Printf("started\n")
-	if len(os.Args) < 2 {
-		fmt.Println("usage: timeshift <timesheet>.wtc [db password]")
+	if len(os.Args) < 3 {
+		fmt.Println("usage: timeshift <timesheet>.wtc YYYYMMDD [db password]")
+		fmt.Println("   YYYYMMDD - end of fortnight (fi 20230416: Mon 3th Apr - Sun 16th inclusive)")
 		fmt.Println("   that will produce <timesheet>_out.xtc and <timesheet_out>.csv")
 		return
 	}
 
-	if password == "" && len(os.Args) > 2 {
-		password = os.Args[2]
+	if password == "" && len(os.Args) > 3 {
+		password = os.Args[3]
 	}
 
 	var err error
@@ -164,6 +170,11 @@ func main() {
 		if err != nil {
 			log.Fatal(fmt.Sprintf("Error getting password: %v", err))
 		}
+	}
+
+	fromDate, toDate, err = parseDate(os.Args[2])
+	if err != nil {
+		log.Fatal(fmt.Sprintf("Error parsing interval date: %s %v", os.Args[2], err))
 	}
 
 	fileName := os.Args[1]
@@ -212,6 +223,12 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
 	}
+}
+
+func parseDate(arg string) (time.Time, time.Time, error) {
+	toDate, err := time.Parse("20060102", arg)
+	fromDate := toDate.AddDate(0, 0, -14)
+	return fromDate, toDate, err
 }
 
 func sortName(s string) string {
@@ -319,6 +336,10 @@ func processCards(timeCards *TimeCards) error {
 		for j, shift := range tc.Shift {
 			arr := make([]ShiftHours, 0)
 			for _, sh := range shift.ShiftHours {
+				// exclude training and admin
+				if sh.Department == "TRAIN" || sh.Department == "92" {
+					continue
+				}
 				if sh.Break != nil && *sh.Break != "00:00" {
 					start := time.Time(sh.StartTime)
 					finish := time.Time(sh.FinishTime)
@@ -411,13 +432,32 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 				}
 				dayOffset++
 			}
-			timeCards.TimeCards[i].Leave[j].FromDate = leave.FromDate
-			timeCards.TimeCards[i].Leave[j].ToDate = leave.ToDate
+			timeCards.TimeCards[i].Leave[j].FromDate = maxDate(leave.FromDate, fromDate)
+			timeCards.TimeCards[i].Leave[j].ToDate = minDate(leave.ToDate, toDate)
 		}
 		dayOffset = 0
 		currentType = ""
 	}
 	return nil
+}
+
+func minDate(xmlDate1 *xmlTime, date2 time.Time) *xmlTime {
+	date1 := time.Time(*xmlDate1)
+	var ret xmlTime
+	if date1.Before(date2) {
+		ret = xmlTime(date1)
+	}
+	ret = xmlTime(date2)
+	return &ret
+}
+func maxDate(xmlDate1 *xmlTime, date2 time.Time) *xmlTime {
+	date1 := time.Time(*xmlDate1)
+	var ret xmlTime
+	if date1.Before(date2) {
+		ret = xmlTime(date2)
+	}
+	ret = xmlTime(date1)
+	return &ret
 }
 
 func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {

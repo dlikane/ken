@@ -168,7 +168,7 @@
 		<TotalHours>69.25</TotalHours>
 		<Leave Type="Compassionate" Hours="0">
 			<FromDate>2023-03-16T08:45:00</FromDate>
-			<ToDate>2023-03-16T18:00:00</ToDate>
+			<ToDate>2023-03-19T00:00:00</ToDate>
 		</Leave>
 	</TimeCard>
 </TimeCards>
