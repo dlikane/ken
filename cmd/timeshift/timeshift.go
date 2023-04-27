@@ -179,8 +179,10 @@ func main() {
 
 	fileName := os.Args[1]
 	ext := filepath.Ext(fileName)
-	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
-	csvFileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ".csv"
+	trimFilename := strings.ReplaceAll(fileName, "[", "_")
+	trimFilename = strings.ReplaceAll(trimFilename, "]", "_")
+	fileNameOut := trimFilename[:len(trimFilename)-len(ext)] + "_out" + ext
+	csvFileNameOut := trimFilename[:len(trimFilename)-len(ext)] + "_out" + ".csv"
 
 	leaveData, err := readLeaveData()
 	if err != nil {
@@ -412,6 +414,7 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 				} else {
 					timeCards.TimeCards[i].Leave[j].Type = "Accrued Days"
 				}
+				fallthrough
 			case "Annual", "Sick", "Long Service", "Compassionate":
 				if isStaff && leave.Hours == 7.6 {
 					if currentType != leave.Type {
