@@ -427,7 +427,10 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 					}
 					timeCards.TimeCards[i].Leave[j].Hours = hours
 				} else if !isStaff {
-					timeCards.TimeCards[i].Leave[j].Hours = 0
+					// keep unchanged for casuals 'Long Service'
+					if leave.Type != "Long Service" {
+						timeCards.TimeCards[i].Leave[j].Hours = 0
+					}
 				}
 				dayOffset++
 			}
