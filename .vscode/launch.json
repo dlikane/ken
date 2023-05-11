@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "cmd/timeshift",
-            "args": ["./data/test.wtc", "mbq.HPH2uvp4adu.dnk"]
+            "args": ["./data/bug_foley.wtc", "20230423", "mbq.HPH2uvp4adu.dnk"]
         },
         {
             "name": "Invoicedates run october",

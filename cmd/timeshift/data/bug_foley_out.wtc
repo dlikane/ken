@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TimeCards Version="2.3">
+	<TimeCard>
+		<TimeCardNo>FOLJ</TimeCardNo>
+		<EmployeeName>Foley Juliana</EmployeeName>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-04-22T07:30:00</StartTime>
+				<FinishTime>2023-04-22T10:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-04-22T12:00:00</StartTime>
+				<FinishTime>2023-04-22T14:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-04-22T17:00:00</StartTime>
+				<FinishTime>2023-04-22T19:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-04-22T20:30:00</StartTime>
+				<FinishTime>2023-04-22T22:30:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-04-24T12:00:00</StartTime>
+				<FinishTime>2023-04-24T14:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Shift>
+			<ShiftHours>
+				<StartTime>2023-04-24T17:00:00</StartTime>
+				<FinishTime>2023-04-24T19:00:00</FinishTime>
+				<Department>INHOME</Department>
+				<Job></Job>
+			</ShiftHours>
+		</Shift>
+		<Allowance Type="Unit">
+			<AllowanceNo>First Broken</AllowanceNo>
+			<Value>1</Value>
+		</Allowance>
+		<Allowance Type="Unit">
+			<AllowanceNo>Second Broken</AllowanceNo>
+			<Value>1</Value>
+		</Allowance>
+		<TotalHours>16.5</TotalHours>
+	</TimeCard>
+</TimeCards>
