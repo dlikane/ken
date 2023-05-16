@@ -135,6 +135,7 @@ type CsvShift struct {
 	ActualFirst  float64 `csv:"ActualFirst"`
 	ActualSecond float64 `csv:"ActualSecond"`
 	IsShort      bool    `csv:"IsShort"`
+	Department   string  `csv:"Department"`
 }
 
 type LeaveData map[string]map[string]float32
@@ -473,9 +474,9 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		for i, shift := range tc.Shift {
 			for j, sh := range shift.ShiftHours {
 				// exclude training and admin
-				if sh.Department == "TRAIN" || sh.Department == "92" {
-					continue
-				}
+				//if sh.Department == "TRAIN" || sh.Department == "92" {
+				//	continue
+				//}
 
 				// is new day
 				if previousShift != nil && truncateToDay(sh.StartTime) != truncateToDay(previousShift.StartTime) {
@@ -584,6 +585,7 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					ActualFirst:  actualFirst,
 					ActualSecond: actualSecond,
 					IsShort:      isShort,
+					Department:   sh.Department,
 				})
 
 				shiftNdx++
