@@ -434,6 +434,8 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 					}
 				}
 				dayOffset++
+			default:
+				timeCards.TimeCards[i].Leave[j].Hours = 0
 			}
 			timeCards.TimeCards[i].Leave[j].FromDate = maxDate(leave.FromDate, fromDate)
 			timeCards.TimeCards[i].Leave[j].ToDate = minDate(leave.ToDate, toDate)
