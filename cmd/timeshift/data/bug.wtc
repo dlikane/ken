@@ -1,21 +1,66 @@
 <?xml version="1.0"?>
 <TimeCards Version="2.3">
     <TimeCard>
-        <TimeCardNo>HOLH</TimeCardNo>
-        <EmployeeName>Holland Henry</EmployeeName>
+        <TimeCardNo>LEEM</TimeCardNo>
+        <EmployeeName>Leersen Megan</EmployeeName>
         <Shift>
             <ShiftHours>
-                <StartTime>2023-05-04T08:30:00</StartTime>
-                <FinishTime>2023-05-04T15:15:00</FinishTime>
-                <Break>00:00</Break>
-                <Department>71</Department>
+                <StartTime>2023-05-01T08:45:00</StartTime>
+                <FinishTime>2023-05-01T15:00:00</FinishTime>
+                <Break>00:20</Break>
+                <Department>COMPRO</Department>
                 <Job/>
             </ShiftHours>
         </Shift>
         <Shift>
             <ShiftHours>
-                <StartTime>2023-05-04T15:15:00</StartTime>
-                <FinishTime>2023-05-04T15:30:00</FinishTime>
+                <StartTime>2023-05-01T15:00:00</StartTime>
+                <FinishTime>2023-05-01T18:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-01T21:00:00</StartTime>
+                <FinishTime>2023-05-01T23:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-02T10:00:00</StartTime>
+                <FinishTime>2023-05-02T13:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-02T13:00:00</StartTime>
+                <FinishTime>2023-05-02T15:15:00</FinishTime>
+                <Break>00:15</Break>
+                <Department>COMPRO</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-03T08:30:00</StartTime>
+                <FinishTime>2023-05-03T15:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>COMPRO</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-03T17:00:00</StartTime>
+                <FinishTime>2023-05-03T17:30:00</FinishTime>
                 <Break>00:00</Break>
                 <Department>92</Department>
                 <Job/>
@@ -23,17 +68,114 @@
         </Shift>
         <Shift>
             <ShiftHours>
-                <StartTime>2023-05-04T15:30:00</StartTime>
-                <FinishTime>2023-05-04T17:30:00</FinishTime>
+                <StartTime>2023-05-03T21:00:00</StartTime>
+                <FinishTime>2023-05-03T23:00:00</FinishTime>
                 <Break>00:00</Break>
-                <Department>19</Department>
+                <Department>INHOME</Department>
                 <Job/>
             </ShiftHours>
         </Shift>
-        <Allowance Type="Unit">
-            <AllowanceNo>KMS</AllowanceNo>
-            <Value>249</Value>
-        </Allowance>
-        <TotalHours>85.25</TotalHours>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-04T08:15:00</StartTime>
+                <FinishTime>2023-05-04T16:30:00</FinishTime>
+                <Break>00:15</Break>
+                <Department>COMPRO</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-04T17:00:00</StartTime>
+                <FinishTime>2023-05-04T19:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-05T08:45:00</StartTime>
+                <FinishTime>2023-05-05T15:15:00</FinishTime>
+                <Break>00:30</Break>
+                <Department>COMPRO</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-05T21:00:00</StartTime>
+                <FinishTime>2023-05-05T23:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-06T21:00:00</StartTime>
+                <FinishTime>2023-05-06T23:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-09T14:00:00</StartTime>
+                <FinishTime>2023-05-09T16:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>COMPRO</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-12T09:30:00</StartTime>
+                <FinishTime>2023-05-12T16:00:00</FinishTime>
+                <Break>00:30</Break>
+                <Department>COMPRO</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-14T16:30:00</StartTime>
+                <FinishTime>2023-05-14T18:30:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-14T21:00:00</StartTime>
+                <FinishTime>2023-05-14T23:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <TotalHours>96.75</TotalHours>
+        <Leave Type="Unavailability" Hours="7.6">
+            <FromDate>2023-05-07T00:00:00</FromDate>
+            <ToDate>2023-05-11T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Unavailability" Hours="7.6">
+            <FromDate>2023-05-07T00:00:00</FromDate>
+            <ToDate>2023-05-11T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Unavailability" Hours="7.6">
+            <FromDate>2023-05-07T00:00:00</FromDate>
+            <ToDate>2023-05-11T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Unavailability" Hours="7.6">
+            <FromDate>2023-05-07T00:00:00</FromDate>
+            <ToDate>2023-05-11T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Unavailability" Hours="7.6">
+            <FromDate>2023-05-07T00:00:00</FromDate>
+            <ToDate>2023-05-11T00:00:00</ToDate>
+        </Leave>
     </TimeCard>
 </TimeCards>
