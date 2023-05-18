@@ -426,6 +426,7 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 				} else {
 					timeCards.TimeCards[i].Leave[j].Type = "Accrued Days"
 				}
+				leave = timeCards.TimeCards[i].Leave[j]
 				fallthrough
 			case "Annual", "Sick", "Long Service", "Compassionate":
 				if isStaff && leave.Hours == 7.6 {
@@ -439,8 +440,8 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 					}
 					timeCards.TimeCards[i].Leave[j].Hours = hours
 				} else if !isStaff {
-					// keep unchanged for casuals 'Long Service'
-					if leave.Type != "Long Service" {
+					// keep unchanged for casuals 'Long Service' and "Accrued Days"
+					if leave.Type != "Long Service" && leave.Type != "Accrued Days" {
 						timeCards.TimeCards[i].Leave[j].Hours = 0
 					}
 				}
