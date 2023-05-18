@@ -394,7 +394,8 @@ func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffse
 	if _, isHoliday := holidayData[date]; isHoliday {
 		return 0, nil
 	}
-	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()%6]
+	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()]
+	//log.Printf("date: %s, weekday: %s", date.String(), weekDay)
 	hours, ok := leaveData[sortName(name)][weekDay]
 	if !ok {
 		return 0, nil
@@ -409,6 +410,10 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 	for i, tc := range timeCards.TimeCards {
 		isStaff := leaveDataHasStaff(leaveData, tc.EmployeeName)
 		for j, leave := range tc.Leave {
+			timeCards.TimeCards[i].Leave[j].FromDate = maxDate(leave.FromDate, fromDate)
+			timeCards.TimeCards[i].Leave[j].ToDate = minDate(leave.ToDate, toDate)
+			leave = timeCards.TimeCards[i].Leave[j]
+
 			if prevFromDate != xmlTime(time.Time{}) {
 				if prevFromDate != *leave.FromDate {
 					dayOffset = 0
@@ -444,9 +449,6 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 				timeCards.TimeCards[i].Leave[j].Hours = 0
 			}
 			prevFromDate = *leave.FromDate
-
-			timeCards.TimeCards[i].Leave[j].FromDate = maxDate(leave.FromDate, fromDate)
-			timeCards.TimeCards[i].Leave[j].ToDate = minDate(leave.ToDate, toDate)
 		}
 		dayOffset = 0
 		currentType = ""
