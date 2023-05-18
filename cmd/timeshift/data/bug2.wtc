@@ -1,2 +1,64 @@
 <?xml version="1.0"?>
-<TimeCards Version="2.3"><TimeCard><TimeCardNo>WRIB</TimeCardNo><EmployeeName>Brittany Wright</EmployeeName><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-01T00:00:00</FromDate><ToDate>2023-05-05T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-01T00:00:00</FromDate><ToDate>2023-05-05T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-01T00:00:00</FromDate><ToDate>2023-05-05T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-01T00:00:00</FromDate><ToDate>2023-05-05T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-01T00:00:00</FromDate><ToDate>2023-05-05T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-08T00:00:00</FromDate><ToDate>2023-05-12T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-08T00:00:00</FromDate><ToDate>2023-05-12T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-08T00:00:00</FromDate><ToDate>2023-05-12T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-08T00:00:00</FromDate><ToDate>2023-05-12T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-05-08T00:00:00</FromDate><ToDate>2023-05-12T00:00:00</ToDate></Leave><TotalHours>76</TotalHours></TimeCard><TimeCard><TimeCardNo>QUATA</TimeCardNo><EmployeeName>Tara Pownceby</EmployeeName><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><Leave Type="Annual" Hours="7.6"><FromDate>2023-04-21T00:00:00</FromDate><ToDate>2023-09-15T00:00:00</ToDate></Leave><TotalHours>106.4</TotalHours></TimeCard></TimeCards>
+<TimeCards Version="2.3">
+    <TimeCard>
+        <TimeCardNo>QUATA</TimeCardNo>
+        <EmployeeName>Tara Pownceby</EmployeeName>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <Leave Type="Annual" Hours="7.6">
+            <FromDate>2023-04-21T00:00:00</FromDate>
+            <ToDate>2023-09-15T00:00:00</ToDate>
+        </Leave>
+        <TotalHours>106.4</TotalHours>
+    </TimeCard>
+</TimeCards>

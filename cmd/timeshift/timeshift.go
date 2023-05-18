@@ -405,9 +405,15 @@ func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffse
 func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData HolidayData) error {
 	dayOffset := 0
 	currentType := ""
+	prevFromDate := xmlTime(time.Time{})
 	for i, tc := range timeCards.TimeCards {
 		isStaff := leaveDataHasStaff(leaveData, tc.EmployeeName)
 		for j, leave := range tc.Leave {
+			if prevFromDate != xmlTime(time.Time{}) {
+				if prevFromDate != *leave.FromDate {
+					dayOffset = 0
+				}
+			}
 			switch leave.Type {
 			case "Time in Lieu":
 				if isStaff {
@@ -437,11 +443,14 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 			default:
 				timeCards.TimeCards[i].Leave[j].Hours = 0
 			}
+			prevFromDate = *leave.FromDate
+
 			timeCards.TimeCards[i].Leave[j].FromDate = maxDate(leave.FromDate, fromDate)
 			timeCards.TimeCards[i].Leave[j].ToDate = minDate(leave.ToDate, toDate)
 		}
 		dayOffset = 0
 		currentType = ""
+		prevFromDate = xmlTime(time.Time{})
 	}
 	return nil
 }
