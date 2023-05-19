@@ -609,8 +609,10 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					Department:   sh.Department,
 				})
 
-				shiftNdx++
-				continuesShift += shiftDuration
+				if !isTrainingOrAdmin {
+					shiftNdx++
+					continuesShift += shiftDuration
+				}
 				previousShift = &shift.ShiftHours[j]
 			}
 		}
