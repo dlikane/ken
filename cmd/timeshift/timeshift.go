@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"database/sql"
 	"encoding/xml"
 	"fmt"
@@ -17,18 +19,19 @@ import (
 	"github.com/jszwec/csvutil"
 	"golang.org/x/term"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 )
 
 // Replace with your own connection parameters
 var (
-	server   = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
-	port     = 6033
-	user     = "skillsconn_bi"
-	password = ""
-	dbname   = "flg_skillsconn"
-	fromDate time.Time
-	toDate   time.Time
+	server           = "xtnjypc2pt4f.db-ro.flowlogic.com.au"
+	port             = 6033
+	user             = "skillsconn_bi"
+	password         = "Paothae9Ai0Iezoow9xahNg7"
+	dbname           = "flg_skillsconn"
+	connectionString = ""
+	fromDate         time.Time
+	toDate           time.Time
 )
 
 const (
@@ -155,18 +158,20 @@ func credentials() (string, error) {
 func main() {
 	log.Printf("started\n")
 	if len(os.Args) < 3 {
-		fmt.Println("usage: timeshift <timesheet>.wtc YYYYMMDD [db password]")
+		fmt.Println("usage: timeshift <timesheet>.wtc YYYYMMDD [connection_string]")
 		fmt.Println("   YYYYMMDD - end of fortnight (fi 20230416: Mon 3th Apr - Sun 16th inclusive)")
 		fmt.Println("   that will produce <timesheet>_out.xtc and <timesheet_out>.csv")
+		fmt.Println("   connection_string: in format: skillsconn_bi:******@tcp(xtnjypc2pt4f.db-ro.flowlogic.com.au:6033)/flg_skillsconn")
+		fmt.Println("       user:password@tcp(server:port)")
 		return
 	}
 
-	if password == "" && len(os.Args) > 3 {
-		password = os.Args[3]
+	if connectionString == "" && len(os.Args) > 3 {
+		connectionString = os.Args[3]
 	}
 
 	var err error
-	if password == "" {
+	if connectionString == "" && password == "" {
 		password, err = credentials()
 		if err != nil {
 			log.Fatal(fmt.Sprintf("Error getting password: %v", err))
@@ -240,10 +245,32 @@ func sortName(s string) string {
 	return strings.Join(words, " ")
 }
 
-func readLeaveData() (LeaveData, error) {
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, server, port, dbname)
-	db, err := sql.Open("mysql", connString)
+func getConnection() (*sql.DB, error) {
+	rootCertPool, err := x509.SystemCertPool()
+	if err != nil {
+		log.Fatalf("Failed to load system root CA certificates: %v", err)
+	}
+	err = mysql.RegisterTLSConfig("custom", &tls.Config{
+		RootCAs:            rootCertPool,
+		InsecureSkipVerify: true,
+		// VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+		//     fmt.Println("Verifying peer certificate")
+		//     return nil
+		// },
+	})
+	if err != nil {
+		log.Fatalf("Failed to register custom TLS config: %v", err)
+	}
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?tls=custom", user, password, server, port, dbname)
+	if connectionString != "" {
+		connString = connectionString + "/tls-custom"
+	}
+	log.Printf("Connection: " + connString)
+	return sql.Open("mysql", connString)
+}
 
+func readLeaveData() (LeaveData, error) {
+	db, err := getConnection()
 	if err != nil {
 		log.Fatal("Error creating connection pool: " + err.Error())
 	}
@@ -276,9 +303,7 @@ func readLeaveData() (LeaveData, error) {
 }
 
 func readHolidays() (HolidayData, error) {
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", user, password, server, port, dbname)
-	db, err := sql.Open("mysql", connString)
-
+	db, err := getConnection()
 	if err != nil {
 		log.Fatal("Error creating connection pool: " + err.Error())
 	}
@@ -290,10 +315,14 @@ func readHolidays() (HolidayData, error) {
 	if err != nil {
 		return nil, err
 	}
-	var date time.Time
+	var dateValue string
 	holidayData := make(HolidayData)
 	for rows.Next() {
-		err := rows.Scan(&date)
+		err := rows.Scan(&dateValue)
+		if err != nil {
+			return nil, err
+		}
+		date, err := time.Parse("2006-01-02", dateValue)
 		if err != nil {
 			return nil, err
 		}
@@ -316,6 +345,14 @@ func readCards(fileName string) (*TimeCards, error) {
 
 	log.Printf("read: %d time cards", len(timeCards.TimeCards))
 	return timeCards, nil
+}
+
+func (l *Leave) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if strings.EqualFold(l.Type, "Unavailability") ||
+		strings.EqualFold(l.Type, "Leave without pay") {
+		return nil
+	}
+	return e.EncodeElement(*l, start)
 }
 
 func writeCards(timeCards *TimeCards, fileName string) error {

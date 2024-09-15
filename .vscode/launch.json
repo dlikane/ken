@@ -5,12 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Roster next",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/rosternext"
+        },
+        {
             "name": "Timeshift run test",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "cmd/timeshift",
-            "args": ["./data/bug_foley.wtc", "20230423", "mbq.HPH2uvp4adu.dnk"]
+            "args": ["./data/bug.wtc", "20230423"]
         },
         {
             "name": "Invoicedates run october",
@@ -19,6 +26,30 @@
             "mode": "auto",
             "program": "cmd/invoicedates",
             "args": ["./data/bp.txt", "-d"]
+        },
+        {
+            "name": "Invoicedates bug3",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/invoicedates",
+            "args": ["./data/bug3.txt", "-d"]
+        },
+        {
+            "name": "Invoicedates bug2",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/invoicedates",
+            "args": ["./data/bug2.txt", "-d"]
+        },
+        {
+            "name": "goshuffle",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/goshuffle",
+            "args": ["-i", "./goshuffle/timeline.etl"]
         }
     ]
 }

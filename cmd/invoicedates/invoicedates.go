@@ -12,36 +12,37 @@ import (
 	"time"
 
 	"github.com/jszwec/csvutil"
+	"github.com/shopspring/decimal"
 )
 
 type Invoice struct {
-	Ord             int     `csv:"Ord"`
-	Cnt             int     `csv:"Cnt"`
-	Recs            string  `csv:"Recs"`
-	FirstName       string  `csv:"Client First Name"`
-	LastName        string  `csv:"Client Last Name"`
-	CardID          string  `csv:"Card ID"`
-	Job             string  `csv:"Job"`
-	Account         string  `csv:"Account N"`
-	TaxCode         string  `csv:"Tax Code"`
-	Description     string  `csv:"Description"`
-	Date            string  `csv:"Date"`
-	Total           string  `csv:"Total"`
-	Price           string  `csv:"Price"`
-	ItemNumber      string  `csv:"Item Number"`
-	Quantity        string  `csv:"Quantity"`
-	Category        string  `csv:"Category"`
-	CustomerPO      string  `csv:"CustomerPO n."`
-	SalesPerson     string  `csv:"Salesperson Name"`
-	Refferal        string  `csv:"Referral Source"`
-	ServiceDateFrom string  `csv:"Service Date From"`
-	ServiceDateTo   string  `csv:"Service Date To"`
-	Memo            string  `csv:"Journal Memo"`
-	Comments        string  `csv:"Comments"`
-	Reference       string  `csv:"Invoice Reference"`
-	Tot             float32 `csv:"-"`
-	Qty             float32 `csv:"-"`
-	MaxQty          float32 `csv:"-"`
+	Ord             int             `csv:"Ord"`
+	Cnt             int             `csv:"Cnt"`
+	Recs            string          `csv:"Recs"`
+	FirstName       string          `csv:"Client First Name"`
+	LastName        string          `csv:"Client Last Name"`
+	CardID          string          `csv:"Card ID"`
+	Job             string          `csv:"Job"`
+	Account         string          `csv:"Account N"`
+	TaxCode         string          `csv:"Tax Code"`
+	Description     string          `csv:"Description"`
+	Date            string          `csv:"Date"`
+	Total           string          `csv:"Total"`
+	Price           string          `csv:"Price"`
+	ItemNumber      string          `csv:"Item Number"`
+	Quantity        string          `csv:"Quantity"`
+	Category        string          `csv:"Category"`
+	CustomerPO      string          `csv:"CustomerPO n."`
+	SalesPerson     string          `csv:"Salesperson Name"`
+	Refferal        string          `csv:"Referral Source"`
+	ServiceDateFrom string          `csv:"Service Date From"`
+	ServiceDateTo   string          `csv:"Service Date To"`
+	Memo            string          `csv:"Journal Memo"`
+	Comments        string          `csv:"Comments"`
+	Reference       string          `csv:"Invoice Reference"`
+	Qty             decimal.Decimal `csv:"-"`
+	MaxQty          decimal.Decimal `csv:"-"`
+	UnitPrice       decimal.Decimal `csv:"-"`
 }
 
 func main() {
@@ -145,13 +146,13 @@ func processInvoices(invoices []Invoice) error {
 				invoices[i].ServiceDateTo = toLastOfMonth.Format("2006-01-02")
 			}
 			invoices[i].Description += " " + reformatDate(invoices[i].ServiceDateFrom) + " - " + reformatDate(invoices[i].ServiceDateTo)
-			qty, err := strconv.ParseFloat(inv.Quantity, 32)
+			qty, err := strconv.ParseFloat(inv.Quantity, 64)
 			if err == nil {
-				invoices[i].Qty = float32(qty)
+				invoices[i].Qty = decimal.NewFromFloat(qty)
 			}
-			tot, err := strconv.ParseFloat(inv.Total, 32)
+			unitPrice, err := strconv.ParseFloat(inv.Price, 64)
 			if err == nil {
-				invoices[i].Tot = float32(tot)
+				invoices[i].UnitPrice = decimal.NewFromFloat(unitPrice)
 			}
 			cnt++
 		}
@@ -173,15 +174,14 @@ func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 			ord++
 			continue
 		}
-		key := inv.CardID + ":" + inv.ServiceDateFrom + inv.ServiceDateTo
+		key := inv.CardID + ":" + inv.ServiceDateFrom + inv.ServiceDateTo + ":" + inv.Price
 		if !isTransport {
 			key = kkey
 		}
 		_, ok := clientInvoices[key]
 		if isTransport && ok {
-			clientInvoices[key].Qty += inv.Qty
-			clientInvoices[key].Tot += inv.Tot
-			if clientInvoices[key].MaxQty < inv.Qty {
+			clientInvoices[key].Qty.Add(inv.Qty)
+			if clientInvoices[key].MaxQty.Cmp(inv.Qty) < 0 {
 				clientInvoices[key].MaxQty = inv.Qty
 				clientInvoices[key].Job = inv.Job
 			}
@@ -199,8 +199,8 @@ func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 	ret := make([]Invoice, 0)
 	for _, inv := range clientInvoices {
 		if inv.CardID != "" {
-			inv.Quantity = fmt.Sprintf("%.2f", inv.Qty)
-			inv.Total = fmt.Sprintf("%.2f", inv.Tot)
+			inv.Quantity = inv.Qty.String()
+			inv.Total = ToCurrencyString(inv.Qty, inv.UnitPrice)
 		}
 		ret = append(ret, *inv)
 	}
@@ -217,33 +217,33 @@ func writeInvoices(isDebug bool, invoices []Invoice, filename string) error {
 	}
 	if !isDebug {
 		type _invoice struct {
-			Ord             int     `csv:"_"`
-			Cnt             int     `csv:"_"`
-			Recs            string  `csv:"_"`
-			FirstName       string  `csv:"Client First Name"`
-			LastName        string  `csv:"Client Last Name"`
-			CardID          string  `csv:"Card ID"`
-			Job             string  `csv:"Job"`
-			Account         string  `csv:"Account N"`
-			TaxCode         string  `csv:"Tax Code"`
-			Description     string  `csv:"Description"`
-			Date            string  `csv:"Date"`
-			Total           string  `csv:"Total"`
-			Price           string  `csv:"Price"`
-			ItemNumber      string  `csv:"Item Number"`
-			Quantity        string  `csv:"Quantity"`
-			Category        string  `csv:"Category"`
-			CustomerPO      string  `csv:"CustomerPO n."`
-			SalesPerson     string  `csv:"Salesperson Name"`
-			Refferal        string  `csv:"Referral Source"`
-			ServiceDateFrom string  `csv:"Service Date From"`
-			ServiceDateTo   string  `csv:"Service Date To"`
-			Memo            string  `csv:"Journal Memo"`
-			Comments        string  `csv:"Comments"`
-			Reference       string  `csv:"Invoice Reference"`
-			Tot             float32 `csv:"-"`
-			Qty             float32 `csv:"-"`
-			MaxQty          float32 `csv:"-"`
+			Ord             int             `csv:"_"`
+			Cnt             int             `csv:"_"`
+			Recs            string          `csv:"_"`
+			FirstName       string          `csv:"Client First Name"`
+			LastName        string          `csv:"Client Last Name"`
+			CardID          string          `csv:"Card ID"`
+			Job             string          `csv:"Job"`
+			Account         string          `csv:"Account N"`
+			TaxCode         string          `csv:"Tax Code"`
+			Description     string          `csv:"Description"`
+			Date            string          `csv:"Date"`
+			Total           string          `csv:"Total"`
+			Price           string          `csv:"Price"`
+			ItemNumber      string          `csv:"Item Number"`
+			Quantity        string          `csv:"Quantity"`
+			Category        string          `csv:"Category"`
+			CustomerPO      string          `csv:"CustomerPO n."`
+			SalesPerson     string          `csv:"Salesperson Name"`
+			Refferal        string          `csv:"Referral Source"`
+			ServiceDateFrom string          `csv:"Service Date From"`
+			ServiceDateTo   string          `csv:"Service Date To"`
+			Memo            string          `csv:"Journal Memo"`
+			Comments        string          `csv:"Comments"`
+			Reference       string          `csv:"Invoice Reference"`
+			Qty             decimal.Decimal `csv:"-"`
+			MaxQty          decimal.Decimal `csv:"-"`
+			UnitPrice       decimal.Decimal `csv:"-"`
 		}
 		_invoices := make([]_invoice, len(invoices))
 		for i, inv := range invoices {
@@ -285,4 +285,9 @@ var codes = map[string]bool{
 	"02_051_0108_1_1":    true,
 	"Linkt Toll Charge":  true,
 	"TAC - Transport":    true,
+}
+
+func ToCurrencyString(qty decimal.Decimal, price decimal.Decimal) string {
+	total := qty.Mul(price).Round(2)
+	return total.String()
 }

@@ -14,7 +14,7 @@ import (
 var server = "auroradb-skillsconn.cluster-ro-cpdlqlocq4io.ap-southeast-2.rds.amazonaws.com"
 var port = 6033
 var user = "skillsconn_bi"
-var password = ""
+var password = "mbq.HPH2uvp4adu.dnk"
 var dbname = "flg_skillsconn"
 
 var baseQuery = `SELECT 
@@ -23,7 +23,7 @@ roster_shift_start,
 roster_shift_end,
 roster_employee_name AS Staff,
 site_name,
-IFNULL(r.roster_shift_note, '') AS Shift_note
+IFNULL(replace (replace(r.roster_shift_note, '\n', ' '), '\r', ' '), '') AS Shift_note
 FROM
 roster_shift r,
 roster_position p,
@@ -77,20 +77,22 @@ func processQuery(db *sql.DB) error {
 	valuePtr := make([]interface{}, count)
 	valueStr := make([]string, count)
 
-	for i, _ := range columns {
+	for i := range columns {
 		valuePtr[i] = &values[i]
 	}
 	fmt.Println(strings.Join(columns, ","))
 	for rows.Next() {
 		rows.Scan(valuePtr...)
-		for i, _ := range columns {
+		for i := range columns {
 			val := values[i]
 			b, ok := val.([]byte)
+			var s string
 			if ok {
-				valueStr[i] = string(b)
+				s = string(b)
 			} else {
-				valueStr[i] = fmt.Sprintf("%v", val)
+				s = fmt.Sprintf("%v", val)
 			}
+			valueStr[i] = s
 		}
 		fmt.Println(strings.Join(valueStr, ","))
 	}
