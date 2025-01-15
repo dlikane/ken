@@ -1,0 +1,148 @@
+// TODO:
+//   not working: Exposure Heatmap
+//                Saturation Heatmap
+//                GrayOut Non-Skin
+//                Highlight Neutrals
+
+// Define UI sliders
+DEFINE_UI_PARAMS(SkinToneIndicator, Skin Tone Indicator, DCTLUI_CHECK_BOX, 1)
+//DEFINE_UI_PARAMS(ExposureHeatmap, Exposure Heatmap, DCTLUI_CHECK_BOX, 0)
+//DEFINE_UI_PARAMS(SaturationHeatmap, Saturation Heatmap, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(GrayOutNonSkinAreas, Gray Out Non-Skin Areas, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(SplitHorizontally, Split Horizontally, DCTLUI_CHECK_BOX, 0)
+DEFINE_UI_PARAMS(SplitVertically, Split Vertically, DCTLUI_CHECK_BOX, 0)
+//DEFINE_UI_PARAMS(HighlightNeutrals, Highlight Neutrals, DCTLUI_CHECK_BOX, 0)
+//DEFINE_UI_PARAMS(Monochrome, Monochrome Mode, DCTLUI_CHECK_BOX, 0)
+
+// Define sliders for skin tone hue midpoint, spread, and hue shift
+DEFINE_UI_PARAMS(SkinToneHueMidpoint, Skin Tone Hue Midpoint, DCTLUI_SLIDER_FLOAT, 23.0, 20.0, 30.0, 0.1)
+DEFINE_UI_PARAMS(SkinToneHueSpread, Skin Tone Hue Spread, DCTLUI_SLIDER_FLOAT, 18.0, 10.0, 20.0, 0.1)
+DEFINE_UI_PARAMS(HueShift, Hue Shift, DCTLUI_SLIDER_FLOAT, 5.0, 2.0, 10.0, 0.1)
+
+// Helper function to convert RGB to HSL
+__DEVICE__ float3 rgbToHsl(float r, float g, float b) {
+    float maxVal = fmaxf(fmaxf(r, g), b);
+    float minVal = fminf(fminf(r, g), b);
+    float delta = maxVal - minVal;
+
+    float h = 0.0f;
+    float s = 0.0f;
+    float l = (maxVal + minVal) / 2.0f;
+
+    if (delta != 0.0f) {
+        s = (l > 0.5f) ? delta / (2.0f - maxVal - minVal) : delta / (maxVal + minVal);
+
+        if (maxVal == r) {
+            h = (g - b) / delta + (g < b ? 6.0f : 0.0f);
+        } else if (maxVal == g) {
+            h = (b - r) / delta + 2.0f;
+        } else {
+            h = (r - g) / delta + 4.0f;
+        }
+
+        h /= 6.0f;
+        h = fmodf(h, 1.0f);  // Ensure hue stays in [0, 1]
+        if (h < 0.0f) h += 1.0f;  // Correct for negative values
+    }
+
+    return make_float3(h * 360.0f, s, l);  // Hue in degrees, saturation, and lightness
+}
+
+// Helper function to replace the color based on the hue
+__DEVICE__ float3 replaceColor(float r, float g, float b, float h, float skinToneHueStart, float skinToneHueEnd, float hueShift) {
+    float spread = (skinToneHueEnd - skinToneHueStart - hueShift) / 2.0f;
+
+    if (h >= skinToneHueStart + spread && h <= skinToneHueStart + spread + hueShift) {
+        return make_float3(0.0f, 0.0f, 1.0f);  // Pure blue
+    }
+    if (h >= skinToneHueStart && h <= skinToneHueEnd) {
+        return make_float3(1.0f, 1.0f, 0.0f);  // Pure yellow
+    }
+    if (h >= skinToneHueStart - hueShift && h < skinToneHueStart) {
+        return make_float3(1.0f, 0.0f, 1.0f);  // Pure magenta
+    }
+    if (h > skinToneHueEnd && h <= skinToneHueEnd + hueShift) {
+        return make_float3(0.0f, 1.0f, 0.0f);  // Pure green
+    }
+
+    return make_float3(r, g, b);  // No change for other hues
+}
+
+__DEVICE__ float luminance(float r, float g, float b) {
+    return dot(make_float3(r, g, b), make_float3(0.299f, 0.587f, 0.114f));  // Rec. 709 luminance
+}
+
+__DEVICE__ float3 rgbToYuv(float r, float g, float b) {
+    float y = 0.299f * r + 0.587f * g + 0.114f * b;
+    float u = -0.14713f * r - 0.28886f * g + 0.436f * b;
+    float v = 0.615f * r - 0.51498f * g - 0.10001f * b;
+    return make_float3(y, u, v);
+}
+
+// Main transform function
+__DEVICE__ float3 transform(int p_Width, int p_Height, int p_X, int p_Y, float p_R, float p_G, float p_B) {
+    float3 originalColor = make_float3(p_R, p_G, p_B);
+    float3 hsl = rgbToHsl(p_R, p_G, p_B);
+    float lum = luminance(p_R, p_G, p_B);
+    float3 yuv = rgbToYuv(p_R, p_G, p_B);
+    float3 color = originalColor;
+
+
+    // Calculate skin tone hue start and end based on midpoint and spread
+    float skinToneHueStart = SkinToneHueMidpoint - SkinToneHueSpread / 2.0f;
+    float skinToneHueEnd = SkinToneHueMidpoint + SkinToneHueSpread / 2.0f;
+
+    // Skin Tone Indicator using HSL hue value
+    if (SkinToneIndicator) {
+        color = replaceColor(p_R, p_G, p_B, hsl.x, skinToneHueStart, skinToneHueEnd, HueShift);
+    }
+
+    // Exposure Heatmap
+//    if (ExposureHeatmap) {
+//        if (lum > 0.9f) {
+//            color = make_float3(1.0f, 0.0f, 0.0f);  // Overexposed in red
+//        } else if (lum < 0.1f) {
+//            color = make_float3(0.0f, 0.0f, 1.0f);  // Underexposed in blue
+//        }
+//    }
+
+    // Saturation Heatmap
+//    float maxVal = fmaxf(fmaxf(p_R, p_G), p_B);
+//    float minVal = fminf(fminf(p_R, p_G), p_B);
+//    float saturation = maxVal - minVal;
+//
+//    if (SaturationHeatmap) {
+//        if (saturation < 0.1f) {
+//            color = make_float3(0.5f, 0.5f, 0.5f);  // Desaturated areas in gray
+//        } else if (saturation > 0.9f) {
+//            color = originalColor * 1.2f;  // Enhance saturation slightly
+//        }
+//    }
+
+    // Gray Out Non-Skin Areas
+    if (GrayOutNonSkinAreas && !(yuv.y > -0.15f && yuv.y < 0.15f && yuv.z > 0.1f && yuv.z < 0.5f)) {
+        color = make_float3(lum, lum, lum);  // Desaturate non-skin areas
+    }
+
+    // Split Horizontally
+    if (SplitHorizontally && p_X > (p_Width / 2)) {
+        color = make_float3(lum, lum, lum);  // Grayscale the right side of the image
+    }
+
+    // Split Vertically
+    if (SplitVertically && p_Y > (p_Height / 2)) {
+        color = make_float3(lum, lum, lum);  // Grayscale the bottom half of the image
+    }
+
+    // Highlight Neutrals
+//    if (HighlightNeutrals && fabsf(p_R - p_G) < 0.05f && fabsf(p_G - p_B) < 0.05f) {
+//        color = originalColor * 1.5f;  // Increase contrast of neutral tones
+//    }
+
+    // Monochrome Mode
+//    if (Monochrome) {
+//        color = make_float3(lum, lum, lum);  // Convert to grayscale
+//    }
+
+    return color;
+}

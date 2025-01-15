@@ -1,9 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
-	"crypto/x509"
-	"database/sql"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -12,59 +9,14 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-	"strings"
-	"syscall"
 	"time"
 
 	"github.com/jszwec/csvutil"
-	"golang.org/x/term"
-
-	"github.com/go-sql-driver/mysql"
-)
-
-// Replace with your own connection parameters
-var (
-	server           = "xtnjypc2pt4f.db-ro.flowlogic.com.au"
-	port             = 6033
-	user             = "skillsconn_bi"
-	password         = "Paothae9Ai0Iezoow9xahNg7"
-	dbname           = "flg_skillsconn"
-	connectionString = ""
-	fromDate         time.Time
-	toDate           time.Time
-)
-
-const (
-	xmlTimeFormat = `2006-01-02T15:04:05`
-
-	LeaveQuery = `SELECT 
-    roster_employee_name AS Staff,
-    library_name AS Field,
-    attribute_value AS Value
-FROM
-    roster_employee e,
-    globe_object_has_globe_shape o,
-    globe_shape s,
-    globe_library l,
-    globe_attribute t
-WHERE
-    e.roster_employee_globeuid = o.object_uid
-        AND o.shape_id = s.shape_id
-        AND library_shape_id = s.shape_id
-        AND l.library_id = t.library_id
-        AND e.roster_employee_globeuid = t.object_uid
-        AND o.ohs_id = t.ohs_id
-        AND roster_employee_deleted = 'no'
-        AND o.ohs_deleted = 'no'
-        AND s.shape_name like 'Leave%'
-        and length(l.library_name) = 3
-        AND attribute_islatest = 'yes'
-group BY o.object_uid , s.shape_id , l.library_id, attribute_revision
-`
-	HolidaysQuery = `SELECT rs_pubhol_date as Holiday FROM flg_skillsconn.roster_public_holidays`
 )
 
 type xmlTime time.Time
+
+const xmlTimeFormat = `2006-01-02T15:04:05`
 
 func (ct xmlTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	t := time.Time(ct)
@@ -106,13 +58,6 @@ type Allowance struct {
 	Value       float32 `xml:"Value"`
 }
 
-type Leave struct {
-	Type     string   `xml:"Type,attr"`
-	Hours    float32  `xml:"Hours,attr"`
-	FromDate *xmlTime `xml:"FromDate,omitempty"`
-	ToDate   *xmlTime `xml:"ToDate,omitempty"`
-}
-
 type TimeCard struct {
 	XMLName      xml.Name    `xml:"TimeCard"`
 	TimeCardNo   string      `xml:"TimeCardNo"`
@@ -120,7 +65,6 @@ type TimeCard struct {
 	Shift        []Shift     `xml:"Shift"`
 	Allowance    []Allowance `xml:"Allowance,omitempty"`
 	TotalHours   float32     `xml:"TotalHours"`
-	Leave        []Leave     `xmld:"Leave,omitempty"`
 }
 
 type TimeCards struct {
@@ -138,69 +82,20 @@ type CsvShift struct {
 	ActualFirst  float64 `csv:"ActualFirst"`
 	ActualSecond float64 `csv:"ActualSecond"`
 	IsShort      bool    `csv:"IsShort"`
-	Department   string  `csv:"Department"`
-}
-
-type LeaveData map[string]map[string]float32
-
-type HolidayData map[time.Time]time.Time
-
-func credentials() (string, error) {
-	fmt.Print("Enter Password: ")
-	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return "", err
-	}
-	password := string(bytePassword)
-	return strings.TrimSpace(password), nil
 }
 
 func main() {
 	log.Printf("started\n")
-	if len(os.Args) < 3 {
-		fmt.Println("usage: timeshift <timesheet>.wtc YYYYMMDD [connection_string]")
-		fmt.Println("   YYYYMMDD - end of fortnight (fi 20230416: Mon 3th Apr - Sun 16th inclusive)")
-		fmt.Println("   that will produce <timesheet>_out.xtc and <timesheet_out>.csv")
-		fmt.Println("   connection_string: in format: skillsconn_bi:******@tcp(xtnjypc2pt4f.db-ro.flowlogic.com.au:6033)/flg_skillsconn")
-		fmt.Println("       user:password@tcp(server:port)")
+	if len(os.Args) < 2 {
+		fmt.Println("usage: timeshift <timesheet>.xml")
+		fmt.Println("   that will produce <timesheet>_out.xml")
 		return
-	}
-
-	if connectionString == "" && len(os.Args) > 3 {
-		connectionString = os.Args[3]
-	}
-
-	var err error
-	if connectionString == "" && password == "" {
-		password, err = credentials()
-		if err != nil {
-			log.Fatal(fmt.Sprintf("Error getting password: %v", err))
-		}
-	}
-
-	fromDate, toDate, err = parseDate(os.Args[2])
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Error parsing interval date: %s %v", os.Args[2], err))
 	}
 
 	fileName := os.Args[1]
 	ext := filepath.Ext(fileName)
-	trimFilename := strings.ReplaceAll(fileName, "[", "_")
-	trimFilename = strings.ReplaceAll(trimFilename, "]", "_")
-	fileNameOut := trimFilename[:len(trimFilename)-len(ext)] + "_out" + ext
-	csvFileNameOut := trimFilename[:len(trimFilename)-len(ext)] + "_out" + ".csv"
-
-	leaveData, err := readLeaveData()
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Error loading data from DB: %v", err))
-	}
-	log.Printf("loaded %d staff from DB", len(leaveData))
-
-	HolidayData, err := readHolidays()
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Error loading holiday data from DB: %v", err))
-	}
-	log.Printf("loaded %d holidays from DB", len(HolidayData))
+	fileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ext
+	csvFileNameOut := fileName[:len(fileName)-len(ext)] + "_out" + ".csv"
 
 	timeCards, err := readCards(fileName)
 	if err != nil {
@@ -217,11 +112,6 @@ func main() {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
 
-	err = processLeaves(timeCards, leaveData, HolidayData)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("process leaves: %v", err))
-	}
-
 	err = writeCsvShifts(csvShifts, csvFileNameOut)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("writting csvs: %v", err))
@@ -231,104 +121,6 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
 	}
-}
-
-func parseDate(arg string) (time.Time, time.Time, error) {
-	toDate, err := time.Parse("20060102", arg)
-	fromDate := toDate.AddDate(0, 0, -13)
-	return fromDate, toDate, err
-}
-
-func sortName(s string) string {
-	words := strings.Fields(s)
-	sort.Strings(words)
-	return strings.Join(words, " ")
-}
-
-func getConnection() (*sql.DB, error) {
-	rootCertPool, err := x509.SystemCertPool()
-	if err != nil {
-		log.Fatalf("Failed to load system root CA certificates: %v", err)
-	}
-	err = mysql.RegisterTLSConfig("custom", &tls.Config{
-		RootCAs:            rootCertPool,
-		InsecureSkipVerify: true,
-		// VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-		//     fmt.Println("Verifying peer certificate")
-		//     return nil
-		// },
-	})
-	if err != nil {
-		log.Fatalf("Failed to register custom TLS config: %v", err)
-	}
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?tls=custom", user, password, server, port, dbname)
-	if connectionString != "" {
-		connString = connectionString + "/tls-custom"
-	}
-	log.Printf("Connection: " + connString)
-	return sql.Open("mysql", connString)
-}
-
-func readLeaveData() (LeaveData, error) {
-	db, err := getConnection()
-	if err != nil {
-		log.Fatal("Error creating connection pool: " + err.Error())
-	}
-	defer db.Close()
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-	rows, err := db.Query(LeaveQuery)
-	if err != nil {
-		return nil, err
-	}
-	var name string
-	var field string
-	var value float32
-	leaveData := make(LeaveData)
-	for rows.Next() {
-		err := rows.Scan(&name, &field, &value)
-		name = sortName(name)
-		if err != nil {
-			return nil, err
-		}
-		staff, ok := leaveData[name]
-		if !ok {
-			staff = make(map[string]float32)
-			leaveData[name] = staff
-		}
-		staff[field] = value
-	}
-	return leaveData, nil
-}
-
-func readHolidays() (HolidayData, error) {
-	db, err := getConnection()
-	if err != nil {
-		log.Fatal("Error creating connection pool: " + err.Error())
-	}
-	defer db.Close()
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-	rows, err := db.Query(HolidaysQuery)
-	if err != nil {
-		return nil, err
-	}
-	var dateValue string
-	holidayData := make(HolidayData)
-	for rows.Next() {
-		err := rows.Scan(&dateValue)
-		if err != nil {
-			return nil, err
-		}
-		date, err := time.Parse("2006-01-02", dateValue)
-		if err != nil {
-			return nil, err
-		}
-		holidayData[date] = date
-	}
-	return holidayData, nil
 }
 
 func readCards(fileName string) (*TimeCards, error) {
@@ -345,14 +137,6 @@ func readCards(fileName string) (*TimeCards, error) {
 
 	log.Printf("read: %d time cards", len(timeCards.TimeCards))
 	return timeCards, nil
-}
-
-func (l *Leave) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if strings.EqualFold(l.Type, "Unavailability") ||
-		strings.EqualFold(l.Type, "Leave without pay") {
-		return nil
-	}
-	return e.EncodeElement(*l, start)
 }
 
 func writeCards(timeCards *TimeCards, fileName string) error {
@@ -421,107 +205,6 @@ func processCards(timeCards *TimeCards) error {
 	return nil
 }
 
-func leaveDataHasStaff(leaveData LeaveData, name string) bool {
-	_, ok := leaveData[sortName(name)]
-	return ok
-}
-
-func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int, holidayData HolidayData) (float32, error) {
-	date := time.Time(fromDate).Add(time.Hour * time.Duration(24*dayOffset))
-	if holidayData != nil {
-		if _, isHoliday := holidayData[date]; isHoliday {
-			return 0, nil
-		}
-	}
-	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()]
-	//log.Printf("date: %s, weekday: %s", date.String(), weekDay)
-	hours, ok := leaveData[sortName(name)][weekDay]
-	if !ok {
-		return 0, nil
-	}
-	return hours, nil
-}
-
-func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData HolidayData) error {
-	dayOffset := 0
-	currentType := ""
-	prevFromDate := xmlTime(time.Time{})
-	for i, tc := range timeCards.TimeCards {
-		isStaff := leaveDataHasStaff(leaveData, tc.EmployeeName)
-		for j, leave := range tc.Leave {
-			timeCards.TimeCards[i].Leave[j].FromDate = maxDate(leave.FromDate, fromDate)
-			timeCards.TimeCards[i].Leave[j].ToDate = minDate(leave.ToDate, toDate)
-			leave = timeCards.TimeCards[i].Leave[j]
-
-			if prevFromDate != xmlTime(time.Time{}) {
-				if prevFromDate != *leave.FromDate {
-					dayOffset = 0
-				}
-			}
-			switch leave.Type {
-			case "Time in Lieu":
-				if isStaff {
-					timeCards.TimeCards[i].Leave[j].Type = "ADO"
-				} else {
-					timeCards.TimeCards[i].Leave[j].Type = "Accrued Days"
-				}
-				leave = timeCards.TimeCards[i].Leave[j]
-				fallthrough
-			case "Annual", "Sick", "Long Service", "Compassionate":
-				if isStaff && leave.Hours == 7.6 {
-					if currentType != leave.Type {
-						dayOffset = 0
-					}
-					currentType = leave.Type
-					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, dayOffset, holidayData)
-					if err != nil {
-						return err
-					}
-					timeCards.TimeCards[i].Leave[j].Hours = hours
-				} else if !isStaff {
-					// keep unchanged for casuals 'Long Service' and "Accrued Days"
-					if leave.Type != "Long Service" && leave.Type != "Accrued Days" {
-						timeCards.TimeCards[i].Leave[j].Hours = 0
-					}
-				}
-				dayOffset++
-			case "PUBHOL":
-				if isStaff && leave.Hours == 7.6 {
-					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, 0, nil)
-					if err != nil {
-						return err
-					}
-					timeCards.TimeCards[i].Leave[j].Hours = hours
-				}
-			default:
-				timeCards.TimeCards[i].Leave[j].Hours = 0
-			}
-			prevFromDate = *leave.FromDate
-		}
-		dayOffset = 0
-		currentType = ""
-		prevFromDate = xmlTime(time.Time{})
-	}
-	return nil
-}
-
-func minDate(xmlDate1 *xmlTime, date2 time.Time) *xmlTime {
-	date1 := time.Time(*xmlDate1)
-	ret := xmlTime(date2)
-	if date1.Before(date2) {
-		ret = xmlTime(date1)
-	}
-	return &ret
-}
-func maxDate(xmlDate1 *xmlTime, date2 time.Time) *xmlTime {
-	date1 := time.Time(*xmlDate1)
-	ret := xmlTime(date1)
-	if date1.Before(date2) {
-		ret = xmlTime(date2)
-	}
-	return &ret
-}
-
 func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 	csvShifts := make([]CsvShift, 0)
 	for i, tc := range timeCards.TimeCards {
@@ -530,13 +213,10 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 		continuesShift := float64(0)
 		cntBreaks := 0
 		shiftNdx := 0
-		carryForward := 0.0
 		var previousShift *ShiftHours
 		isOvernight := false
 		for i, shift := range tc.Shift {
 			for j, sh := range shift.ShiftHours {
-				isTrainingOrAdmin := sh.Department == "TRAIN" || sh.Department == "92"
-
 				// is new day
 				if previousShift != nil && truncateToDay(sh.StartTime) != truncateToDay(previousShift.StartTime) {
 					shiftNdx = 0
@@ -547,7 +227,6 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					continuesShift = 0
 					previousShift = nil
 					cntBreaks = 0
-					carryForward = 0
 				}
 				// instead of isOvernight check that it is not started at midnight:
 				//     isOvernight = truncateToDay(sh.StartTime) != truncateToDay(sh.FinishTime)
@@ -574,14 +253,6 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 
 				if shiftNdx == 0 {
 					breakDuration = 0
-				}
-
-				if isTrainingOrAdmin {
-					carryForward += breakDuration
-					breakDuration = 0
-				} else {
-					breakDuration += carryForward
-					carryForward = 0.0
 				}
 
 				strAllowance := ""
@@ -653,13 +324,10 @@ func processAllowances(timeCards *TimeCards) ([]CsvShift, error) {
 					ActualFirst:  actualFirst,
 					ActualSecond: actualSecond,
 					IsShort:      isShort,
-					Department:   sh.Department,
 				})
 
-				if !isTrainingOrAdmin {
-					shiftNdx++
-					continuesShift += shiftDuration
-				}
+				shiftNdx++
+				continuesShift += shiftDuration
 				previousShift = &shift.ShiftHours[j]
 			}
 		}

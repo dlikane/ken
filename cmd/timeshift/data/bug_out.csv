@@ -1,0 +1,14 @@
+{}
+Full Name,Date,Shift,Break,Allowance,ActualFirst,ActualSecond,IsShort,Department
+Frith Mary,2024-05-13,08:30 - 15:15,0,,0,0,false,13
+Frith Mary,2024-05-13,16:00 - 18:00,0.75,First,0.75,0,false,INHOME
+Frith Mary,2024-05-15,09:00 - 12:30,0,,0,0,false,05
+Frith Mary,2024-05-15,13:00 - 16:00,0.5,,0,0,false,13
+Frith Mary,2024-05-17,09:30 - 15:30,0,,0,0,false,13
+Frith Mary,2024-05-17,15:30 - 17:30,0,,0,0,false,INHOME
+Frith Mary,2024-05-20,08:30 - 15:15,0,,0,0,false,13
+Frith Mary,2024-05-20,16:00 - 18:00,0.75,First,0.75,0,false,INHOME
+Frith Mary,2024-05-22,09:00 - 12:30,0,,0,0,false,05
+Frith Mary,2024-05-22,13:00 - 16:00,0.5,,0,0,false,13
+Frith Mary,2024-05-24,09:30 - 15:30,0,,0,0,false,13
+Frith Mary,2024-05-24,15:30 - 17:30,0,,0,0,false,INHOME

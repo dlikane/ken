@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<TimeCards Version="2.3">
+    <TimeCard>
+        <TimeCardNo>FRAH</TimeCardNo>
+        <EmployeeName>Frania Helen</EmployeeName>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-05T14:00:00</StartTime>
+                <FinishTime>2023-05-05T15:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>TRAIN</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Shift>
+            <ShiftHours>
+                <StartTime>2023-05-05T22:30:00</StartTime>
+                <FinishTime>2023-05-06T03:00:00</FinishTime>
+                <Break>00:00</Break>
+                <Department>INHOME</Department>
+                <Job/>
+            </ShiftHours>
+        </Shift>
+        <Allowance Type="Unit">
+            <AllowanceNo>KMS</AllowanceNo>
+            <Value>1543</Value>
+        </Allowance>
+        <TotalHours>67.25</TotalHours>
+    </TimeCard>
+</TimeCards>
