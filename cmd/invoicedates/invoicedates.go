@@ -45,6 +45,12 @@ type Invoice struct {
 	UnitPrice       decimal.Decimal `csv:"-"`
 }
 
+type Stat struct {
+	lines       int
+	inInvoices  int
+	outInvoices int
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("usage: invoicedates <invoice>.txt [-d]")
@@ -66,11 +72,14 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't parse file: %s: %v", fileName, err))
 	}
+	var stat Stat
+	stat.lines = len(invoices)
 
 	err = processInvoices(invoices)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("process cards: %v", err))
 	}
+	stat.inInvoices = len(invoices) - 1 // header
 
 	if isDebug {
 		err = writeInvoices(isDebug, invoices, fileNameOutAll)
@@ -83,11 +92,13 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't summup invoices: %v", err))
 	}
+	stat.outInvoices = len(invoices) - 1 // header
 
 	err = writeInvoices(isDebug, invoices, fileNameOut)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Can't write file: %s: %v", fileNameOut, err))
 	}
+	log.Printf("number of lines: %d invoices in: %d invoices out: %d", stat.lines, stat.inInvoices, stat.outInvoices)
 }
 
 func readInvoices(filename string) ([]Invoice, error) {
@@ -128,7 +139,7 @@ func processInvoices(invoices []Invoice) error {
 		invoices[i].Recs = fmt.Sprintf("%d", i)
 		if inv.Description != "" && inv.ServiceDateFrom != "" && inv.ServiceDateTo != "" {
 			if _, ok := codes[inv.ItemNumber]; ok {
-				log.Printf("found code")
+				// log.Printf("found code")
 				from, err := time.Parse("2006-01-02", inv.ServiceDateFrom)
 				if err != nil {
 					return err
@@ -157,7 +168,7 @@ func processInvoices(invoices []Invoice) error {
 			cnt++
 		}
 	}
-	log.Printf("number of lines: %d invoices: %d", len(invoices), cnt)
+	//log.Printf("number of lines: %d invoices: %d", len(invoices), cnt)
 	return nil
 }
 
@@ -174,13 +185,14 @@ func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 			ord++
 			continue
 		}
-		key := inv.CardID + ":" + inv.ServiceDateFrom + inv.ServiceDateTo + ":" + inv.Price
+		key := inv.CardID + ":" + inv.Job + ":" + inv.ItemNumber + ":" + inv.ServiceDateFrom + inv.ServiceDateTo + ":" + inv.Price
 		if !isTransport {
 			key = kkey
 		}
 		_, ok := clientInvoices[key]
+		log.Printf("isTransport: %t onlist: %t key: %s", isTransport, ok, key)
 		if isTransport && ok {
-			clientInvoices[key].Qty.Add(inv.Qty)
+			clientInvoices[key].Qty = clientInvoices[key].Qty.Add(inv.Qty)
 			if clientInvoices[key].MaxQty.Cmp(inv.Qty) < 0 {
 				clientInvoices[key].MaxQty = inv.Qty
 				clientInvoices[key].Job = inv.Job

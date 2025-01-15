@@ -428,8 +428,10 @@ func leaveDataHasStaff(leaveData LeaveData, name string) bool {
 
 func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int, holidayData HolidayData) (float32, error) {
 	date := time.Time(fromDate).Add(time.Hour * time.Duration(24*dayOffset))
-	if _, isHoliday := holidayData[date]; isHoliday {
-		return 0, nil
+	if holidayData != nil {
+		if _, isHoliday := holidayData[date]; isHoliday {
+			return 0, nil
+		}
 	}
 	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()]
 	//log.Printf("date: %s, weekday: %s", date.String(), weekDay)
@@ -483,6 +485,14 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 					}
 				}
 				dayOffset++
+			case "PUBHOL":
+				if isStaff && leave.Hours == 7.6 {
+					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, 0, nil)
+					if err != nil {
+						return err
+					}
+					timeCards.TimeCards[i].Leave[j].Hours = hours
+				}
 			default:
 				timeCards.TimeCards[i].Leave[j].Hours = 0
 			}

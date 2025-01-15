@@ -1,0 +1,7 @@
+{}
+"Client First Name","Client Last Name","Card ID",Job,"Account N","Tax Code",Description,Date,Total,Price,"Item Number",Quantity,Category,"CustomerPO n.","Salesperson Name","Referral Source","Service Date From","Service Date To","Journal Memo",Comments,"Invoice Reference"
+"Malcolm Ennis C/O Co-Connect",,ME20608SUPPTRAN,05,,FRE,"02_051_0108_1_1,Transport,TRAN,,",31/08/2024,75,1,02_051_0108_1_1,75,,,,,2024-08-01,2024-08-29,,,20240831
+"Malcolm Ennis C/O Co-Connect",,ME20608SUPPTRAN,INHOME,,FRE,"04_590_0125_6_1,Activity Based Transport,,,",31/08/2024,1239.48,0.99,04_590_0125_6_1,1252,,,,,2024-08-02,2024-08-31,,,20240831
+"Malcolm Ennis C/O Co-Connect",,ME20608SUPPTRAN,12,,FRE,"04_590_0125_6_1,Activity Based Transport,,,",31/08/2024,251.46,0.99,04_590_0125_6_1,254,,,,,2024-08-05,2024-08-20,,,20240831
+"Malcolm Ennis C/O Co-Connect",,ME20608SUPPTRAN,INHOME,,FRE,"02_051_0108_1_1,Transport,,,",31/08/2024,48,1,02_051_0108_1_1,48,,,,,2024-08-26,2024-08-26,,,20240831
+,,,,,,,,,,,,,,,,,,,,
