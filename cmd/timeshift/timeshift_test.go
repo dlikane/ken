@@ -54,3 +54,90 @@ func TestMinDate(t *testing.T) {
 		t.Errorf("Expected min date %v, got %v", expectedDate, *minDate)
 	}
 }
+
+func TestGetConnection(t *testing.T) {
+	_, err := getConnection()
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}
+
+func TestProcessCards(t *testing.T) {
+	timeCards := &TimeCards{
+		TimeCards: []TimeCard{
+			{
+				EmployeeName: "John Doe",
+				Shift: []Shift{
+					{
+						ShiftHours: []ShiftHours{
+							{
+								StartTime:  xmlTime(time.Date(2023, 4, 3, 9, 0, 0, 0, time.UTC)),
+								FinishTime: xmlTime(time.Date(2023, 4, 3, 17, 0, 0, 0, time.UTC)),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	err := processCards(timeCards)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}
+
+func TestProcessAllowances(t *testing.T) {
+	timeCards := &TimeCards{
+		TimeCards: []TimeCard{
+			{
+				EmployeeName: "John Doe",
+				Shift: []Shift{
+					{
+						ShiftHours: []ShiftHours{
+							{
+								StartTime:  xmlTime(time.Date(2023, 4, 3, 9, 0, 0, 0, time.UTC)),
+								FinishTime: xmlTime(time.Date(2023, 4, 3, 17, 0, 0, 0, time.UTC)),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	_, err := processAllowances(timeCards)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}
+
+func TestProcessLeaves(t *testing.T) {
+	fromDate := xmlTime(time.Date(2023, 4, 3, 0, 0, 0, 0, time.UTC))
+	toDate := xmlTime(time.Date(2023, 4, 3, 0, 0, 0, 0, time.UTC))
+	timeCards := &TimeCards{
+		TimeCards: []TimeCard{
+			{
+				EmployeeName: "John Doe",
+				Leave: []Leave{
+					{
+						Type:     "Annual",
+						Hours:    7.6,
+						FromDate: &fromDate,
+						ToDate:   &toDate,
+					},
+				},
+			},
+		},
+	}
+	leaveData := LeaveData{
+		"John Doe": {
+			"Mon": 7.6,
+		},
+	}
+	holidayData := HolidayData{
+		time.Date(2023, 4, 3, 0, 0, 0, 0, time.UTC): time.Date(2023, 4, 3, 0, 0, 0, 0, time.UTC),
+	}
+	err := processLeaves(timeCards, leaveData, holidayData)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}

@@ -704,6 +704,9 @@ func printStartFinish(sh ShiftHours) string {
 }
 
 func writeCsvShifts(csvShifts []CsvShift, filename string) error {
+	if len(csvShifts) == 0 {
+		return nil
+	}
 	b, err := csvutil.Marshal(csvShifts)
 	if err != nil {
 		fmt.Println("error:", err)
