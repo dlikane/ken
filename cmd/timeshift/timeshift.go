@@ -222,6 +222,11 @@ func main() {
 		log.Fatal(fmt.Sprintf("process leaves: %v", err))
 	}
 
+	err = addHolidayIfMissing(timeCards, HolidayData, fromDate, toDate, leaveData)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("add holidays: %v", err))
+	}
+
 	err = writeCsvShifts(csvShifts, csvFileNameOut)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("writting csvs: %v", err))
@@ -426,20 +431,20 @@ func leaveDataHasStaff(leaveData LeaveData, name string) bool {
 	return ok
 }
 
-func leaveDataHours(leaveData LeaveData, name string, fromDate xmlTime, dayOffset int, holidayData HolidayData) (float32, error) {
+func leaveDataHours(leaveData LeaveData,
+	name string, fromDate xmlTime, dayOffset int, holidayData HolidayData) (float32, bool, error) {
 	date := time.Time(fromDate).Add(time.Hour * time.Duration(24*dayOffset))
+	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()]
+	hours, ok := leaveData[sortName(name)][weekDay]
 	if holidayData != nil {
 		if _, isHoliday := holidayData[date]; isHoliday {
-			return 0, nil
+			return hours, true, nil
 		}
 	}
-	weekDay := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}[date.Weekday()]
-	//log.Printf("date: %s, weekday: %s", date.String(), weekDay)
-	hours, ok := leaveData[sortName(name)][weekDay]
 	if !ok {
-		return 0, nil
+		return 0, false, nil
 	}
-	return hours, nil
+	return hours, false, nil
 }
 
 func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData HolidayData) error {
@@ -473,9 +478,12 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 						dayOffset = 0
 					}
 					currentType = leave.Type
-					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, dayOffset, holidayData)
+					hours, isHoliday, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, dayOffset, holidayData)
 					if err != nil {
 						return err
+					}
+					if isHoliday {
+						timeCards.TimeCards[i].Leave[j].Type = "PUBHOL"
 					}
 					timeCards.TimeCards[i].Leave[j].Hours = hours
 				} else if !isStaff {
@@ -487,7 +495,7 @@ func processLeaves(timeCards *TimeCards, leaveData LeaveData, holidayData Holida
 				dayOffset++
 			case "PUBHOL":
 				if isStaff && leave.Hours == 7.6 {
-					hours, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, 0, nil)
+					hours, _, err := leaveDataHours(leaveData, tc.EmployeeName, *leave.FromDate, 0, nil)
 					if err != nil {
 						return err
 					}
@@ -714,4 +722,80 @@ func writeCsvShifts(csvShifts []CsvShift, filename string) error {
 	bb := []byte("{}\n")
 	bb = append(bb, b...)
 	return ioutil.WriteFile(filename, bb, 0644)
+}
+
+// Private function to build a list of holidays that are not on weekends
+func getValidHolidays(holidayData HolidayData, fromDate, toDate time.Time) []time.Time {
+	var holidays []time.Time
+	for date := fromDate; !date.After(toDate); date = date.AddDate(0, 0, 1) {
+		if _, isHoliday := holidayData[date]; isHoliday && date.Weekday() != time.Saturday && date.Weekday() != time.Sunday {
+			holidays = append(holidays, date)
+		}
+	}
+	return holidays
+}
+
+func addHolidayIfMissing(timeCards *TimeCards, holidayData HolidayData, fromDate, toDate time.Time, leaveData LeaveData) error {
+	holidays := getValidHolidays(holidayData, fromDate, toDate)
+	if len(holidays) == 0 {
+		return nil
+	}
+
+	for _, date := range holidays {
+		for i, tc := range timeCards.TimeCards {
+			isStaff := leaveDataHasStaff(leaveData, tc.EmployeeName)
+			if isStaff {
+				hasShift := false
+				hasLeave := false
+				shiftHours := 0.0
+				for _, shift := range tc.Shift {
+					for _, sh := range shift.ShiftHours {
+						if truncateToDay(sh.StartTime).Equal(date) {
+							hasShift = true
+							shiftHours += time.Time(sh.FinishTime).Sub(time.Time(sh.StartTime)).Hours()
+						}
+					}
+				}
+				for _, leave := range tc.Leave {
+					leaveFromDate := time.Time(*leave.FromDate)
+					leaveToDate := time.Time(*leave.ToDate)
+					if !leaveFromDate.After(date) && !leaveToDate.Before(date) {
+						hasLeave = true
+						break
+					}
+				}
+				hours := float32(7.5)
+				h, _, err := leaveDataHours(leaveData, tc.EmployeeName, xmlTime(date), 0, nil)
+				if err == nil {
+					hours = h
+				}
+				if !hasShift && !hasLeave {
+					leave := Leave{
+						Type:     "PUBHOL",
+						Hours:    hours,
+						FromDate: (*xmlTime)(&date),
+						ToDate:   (*xmlTime)(&date),
+					}
+					timeCards.TimeCards[i].Leave = append(timeCards.TimeCards[i].Leave, leave)
+				}
+				if hasShift {
+					msg := fmt.Sprintf("Employee %s logged shift(s) on holiday %s: %f of %f", tc.EmployeeName, date.Format("2006-01-02"), shiftHours, hours)
+					if float32(shiftHours) < hours {
+						log.Printf("%s -> adjusted %f\n", msg, hours-float32(shiftHours))
+						leave := Leave{
+							Type:     "PUBHOL",
+							Hours:    hours - float32(shiftHours),
+							FromDate: (*xmlTime)(&date),
+							ToDate:   (*xmlTime)(&date),
+						}
+						timeCards.TimeCards[i].Leave = append(timeCards.TimeCards[i].Leave, leave)
+
+					} else {
+						log.Printf("%s -> no adjustments required\n", msg)
+					}
+				}
+			}
+		}
+	}
+	return nil
 }

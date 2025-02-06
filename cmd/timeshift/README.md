@@ -1,3 +1,22 @@
+20250122:
+
+Note Holiday code = PUBHOL
+
+If other types of leave include the public holiday date, we need to replace that leave on the day with the public holiday.  
+I think you are putting zero hours when a public holiday for other types of leave, 
+so you have that check coded already, just need to change the leave type and hours.
+
+Remember we have 5 types of other leave – annual, long service, sick, compassionate and time in lieu.
+
+ALSO you currently load in 75 staff with leave hours.  You need to create a PUBHOL entry for them if they have not 
+entered other leave on the public holiday date as with the last <TimeCardNo>THOA in the sample data.
+
+Questions:
+    1. You have 7.6 hours for you for each day. Should I keep that for PUBHOL when replace in output or where should I take 7.5?
+    2. Same for Tammy, I put 7.6 - you have 7 for him.
+    3. I guess you want to add PUBHOL only if there is none (for staff) and public holiday is not weekend.
+
+
 20230308:
 
 Timesheet and leave merge file attached, this will become the new input to timeshift.go
