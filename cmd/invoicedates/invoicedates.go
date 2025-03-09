@@ -185,12 +185,13 @@ func sumUpInvoices(invoices []Invoice) ([]Invoice, error) {
 			ord++
 			continue
 		}
-		key := inv.CardID + ":" + inv.Job + ":" + inv.ItemNumber + ":" + inv.ServiceDateFrom + inv.ServiceDateTo + ":" + inv.Price
+		//key := inv.CardID + ":" + inv.Job + ":" + inv.ItemNumber + ":" + inv.ServiceDateFrom + inv.ServiceDateTo + ":" + inv.Price
+		key := inv.CardID + ":" + inv.Job + ":" + inv.ItemNumber + ":" + inv.Price
 		if !isTransport {
 			key = kkey
 		}
 		_, ok := clientInvoices[key]
-		log.Printf("isTransport: %t onlist: %t key: %s", isTransport, ok, key)
+		log.Printf("isTransport (%s): %t onlist: %t key (cardID:Job:ItemNumber:Price): %s", inv.ItemNumber, isTransport, ok, key)
 		if isTransport && ok {
 			clientInvoices[key].Qty = clientInvoices[key].Qty.Add(inv.Qty)
 			if clientInvoices[key].MaxQty.Cmp(inv.Qty) < 0 {
